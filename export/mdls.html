@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="pandoc">
+  <title>mdls and Spotlight Metadata Attributes</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Tokens ─────────────────────────────── */
+    :root {
+      --bg:        #0b1020;
+      --surface:   #11192a;
+      --surface2:  #172239;
+      --border:    #2a3550;
+      --border2:   #3a4969;
+      --text:      #edf2f9;
+      --text2:     #bcc7da;
+      --text3:     #7f8eab;
+      --accent:    #7db1ff;
+      --accent2:   #b8d0ff;
+      --link:      #9ec2ff;
+      --code-bg:   #10182a;
+      --code-text: #e8edf6;
+      --mark-bg:   rgba(125,177,255,0.18);
+      --radius:    12px;
+      --font-body: 'IBM Plex Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+      --font-head: 'IBM Plex Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --max-w:     88ch;
+      --sidebar-w: 252px;
+    }
+
+    /* ── Reset ───────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+    /* ── Page chrome ─────────────────────────── */
+    body {
+      background:
+        radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 14%, transparent) 0, transparent 34%),
+        radial-gradient(circle at top right, color-mix(in srgb, #f1b98a 10%, transparent) 0, transparent 28%),
+        linear-gradient(180deg, color-mix(in srgb, var(--surface) 24%, var(--bg)) 0%, var(--bg) 22%, var(--bg) 100%);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1.08rem;
+      line-height: 1.74;
+      text-rendering: optimizeLegibility;
+      font-optical-sizing: auto;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ──────────────────────────────── */
+    .page-wrap {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* ── Sidebar / TOC ───────────────────────── */
+    #toc-sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 2.5rem 1.25rem 2rem 1.5rem;
+      border-right: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      backdrop-filter: blur(16px);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+    #toc-sidebar:empty { display: none; }
+
+    .toc-index-link {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .toc-index-link a {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      text-decoration: none;
+      display: block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .toc-index-link a:hover {
+      color: var(--accent2);
+      background: var(--surface2);
+    }
+
+    .toc-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #toc-sidebar nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    #toc-sidebar nav li { margin: 0; }
+    #toc-sidebar nav a {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 0.84rem;
+      line-height: 1.4;
+      color: var(--text2);
+      text-decoration: none;
+      padding: 0.35rem 0.55rem;
+      border-radius: 6px;
+      border-left: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    #toc-sidebar nav a:hover {
+      color: var(--text);
+      background: var(--surface2);
+      border-left-color: var(--accent);
+    }
+    #toc-sidebar nav a.active {
+      color: var(--accent2);
+      border-left-color: var(--accent);
+      background: var(--mark-bg);
+    }
+    /* Indent nested TOC */
+    #toc-sidebar nav ul ul { padding-left: 0.75rem; }
+    #toc-sidebar nav ul ul a { font-size: 0.75rem; }
+
+    /* ── Main content ────────────────────────── */
+    .content-wrap {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3.5rem 2.75rem 7rem;
+    }
+
+    /* ── Doc header ──────────────────────────── */
+    .doc-header {
+      width: 100%;
+      max-width: var(--max-w);
+      margin-bottom: 3.4rem;
+      padding-bottom: 1.9rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+      animation: fadeUp 0.45s ease both;
+    }
+
+    .doc-header h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2.18rem, 4vw, 3.28rem);
+      font-weight: 700;
+      line-height: 1.06;
+      color: var(--text);
+      margin-bottom: 0.95rem;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+    }
+
+    .doc-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text3);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .doc-meta span { display: flex; align-items: center; gap: 0.35rem; }
+    .doc-meta .sep { color: var(--border2); }
+
+    /* ── Article body ────────────────────────── */
+    article {
+      width: 100%;
+      max-width: var(--max-w);
+      animation: fadeUp 0.55s 0.08s ease both;
+    }
+
+    /* Headings */
+    article h1, article h2, article h3, article h4, article h5, article h6 {
+      font-family: var(--font-head);
+      line-height: 1.12;
+      color: var(--text);
+      margin-top: 2.9rem;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.035em;
+      text-wrap: balance;
+    }
+    article h1 { font-size: 2.26rem; font-weight: 700; }
+    article h2 {
+      font-size: 1.68rem;
+      font-weight: 600;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+    }
+    article h3 { font-size: 1.34rem; font-weight: 600; }
+    article h4 { font-size: 1.1rem; font-weight: 600; color: var(--text2); }
+    article h5, article h6 { font-size: 0.98rem; font-weight: 600; color: var(--text2); }
+
+    /* Anchor links on headings */
+    article h1 a, article h2 a, article h3 a,
+    article h4 a, article h5 a, article h6 a {
+      color: inherit; text-decoration: none;
+    }
+    article h2:hover::after, article h3:hover::after {
+      content: ' #';
+      color: var(--text3);
+      font-family: var(--font-mono);
+      font-size: 0.75em;
+      font-weight: 400;
+    }
+
+    /* Paragraphs */
+    article p {
+      margin-bottom: 1.28rem;
+      max-width: 100%;
+    }
+
+    /* Links */
+    article a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.16em;
+      transition: color 0.15s, text-decoration-color 0.15s;
+    }
+    article a:hover {
+      color: var(--accent2);
+      text-decoration-color: var(--accent2);
+    }
+
+    /* Lists */
+    article ul, article ol {
+      padding-left: 1.7rem;
+      margin-bottom: 1.35rem;
+    }
+    article li { margin-bottom: 0.42rem; }
+    article li > ul, article li > ol { margin-top: 0.35rem; margin-bottom: 0; }
+
+    /* Blockquote */
+    article blockquote {
+      margin: 1.8rem 0;
+      padding: 0.95rem 1.35rem;
+      border-left: 3px solid var(--accent);
+      background: color-mix(in srgb, var(--surface2) 84%, transparent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      color: var(--text2);
+      font-style: italic;
+      box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent2) 12%, transparent);
+    }
+    article blockquote p { margin-bottom: 0; }
+
+    /* ── Callout / Admonition blocks ──────────── */
+    /* pandoc fenced divs:  ::: info\n...\n:::     */
+    article .note, article .info, article .tip,
+    article .warning, article .caution, article .danger,
+    article .error, article .success, article .important,
+    article .abstract, article .question, article .bug,
+    article blockquote.note, article blockquote.info, article blockquote.tip,
+    article blockquote.warning, article blockquote.caution, article blockquote.danger,
+    article blockquote.error, article blockquote.success, article blockquote.important,
+    article blockquote.abstract, article blockquote.question, article blockquote.bug {
+      position: relative;
+      margin: 1.5rem 0;
+      padding: 0.85rem 1.25rem 0.85rem 1.25rem;
+      padding-top: 2.75rem;
+      border-left: 3px solid var(--callout-color, var(--accent));
+      background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--callout-color, var(--accent)) 12%, transparent) 0,
+        color-mix(in srgb, var(--callout-color, var(--accent)) 12%, transparent) 2.5rem,
+        color-mix(in srgb, var(--callout-color, var(--accent))  5%, transparent) 2.5rem
+      );
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-style: normal;
+      color: var(--text);
+    }
+
+    article .note::before, article .info::before, article .tip::before,
+    article .warning::before, article .caution::before, article .danger::before,
+    article .error::before, article .success::before, article .important::before,
+    article .abstract::before, article .question::before, article .bug::before,
+    article blockquote.note::before, article blockquote.info::before,
+    article blockquote.tip::before, article blockquote.warning::before,
+    article blockquote.caution::before, article blockquote.danger::before,
+    article blockquote.error::before, article blockquote.success::before,
+    article blockquote.important::before, article blockquote.abstract::before,
+    article blockquote.question::before, article blockquote.bug::before {
+      content: var(--callout-icon, 'ℹ');
+      position: absolute;
+      top: 0.55rem;
+      left: 1.25rem;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    article .note::after, article .info::after, article .tip::after,
+    article .warning::after, article .caution::after, article .danger::after,
+    article .error::after, article .success::after, article .important::after,
+    article .abstract::after, article .question::after, article .bug::after,
+    article blockquote.note::after, article blockquote.info::after,
+    article blockquote.tip::after, article blockquote.warning::after,
+    article blockquote.caution::after, article blockquote.danger::after,
+    article blockquote.error::after, article blockquote.success::after,
+    article blockquote.important::after, article blockquote.abstract::after,
+    article blockquote.question::after, article blockquote.bug::after {
+      content: var(--callout-name, 'note');
+      position: absolute;
+      top: 0.8rem;
+      left: 2.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--callout-color);
+      line-height: 1;
+    }
+
+    article .note p:last-child, article .info p:last-child,
+    article .tip p:last-child, article .warning p:last-child,
+    article .caution p:last-child, article .danger p:last-child,
+    article .error p:last-child, article .success p:last-child,
+    article .important p:last-child, article .abstract p:last-child,
+    article .question p:last-child, article .bug p:last-child { margin-bottom: 0; }
+
+    /* Per-type tokens */
+    article .note,      article blockquote.note      { --callout-color: #90a4ae; --callout-icon: '📝'; --callout-name: 'note'; }
+    article .info,      article blockquote.info      { --callout-color: #4fc3f7; --callout-icon: 'ℹ';  --callout-name: 'info'; }
+    article .tip,       article blockquote.tip       { --callout-color: #81c784; --callout-icon: '💡'; --callout-name: 'tip'; }
+    article .warning,   article blockquote.warning   { --callout-color: #ffb74d; --callout-icon: '⚠';  --callout-name: 'warning'; }
+    article .caution,   article blockquote.caution   { --callout-color: #ff8a65; --callout-icon: '🔥'; --callout-name: 'caution'; }
+    article .danger,    article blockquote.danger    { --callout-color: #ef5350; --callout-icon: '✕';  --callout-name: 'danger'; }
+    article .error,     article blockquote.error     { --callout-color: #ef5350; --callout-icon: '✕';  --callout-name: 'error'; }
+    article .success,   article blockquote.success   { --callout-color: #66bb6a; --callout-icon: '✓';  --callout-name: 'success'; }
+    article .important, article blockquote.important { --callout-color: #ce93d8; --callout-icon: '★';  --callout-name: 'important'; }
+    article .abstract,  article blockquote.abstract  { --callout-color: #80cbc4; --callout-icon: '◈';  --callout-name: 'abstract'; }
+    article .question,  article blockquote.question  { --callout-color: #ffcc80; --callout-icon: '?';  --callout-name: 'question'; }
+    article .bug,       article blockquote.bug       { --callout-color: #f48fb1; --callout-icon: '🐛'; --callout-name: 'bug'; }
+
+    /* Horizontal rule */
+    article hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* Tables */
+    article table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      margin-bottom: 1.8rem;
+      background: color-mix(in srgb, var(--surface) 78%, transparent);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    article thead tr { border-bottom: 2px solid var(--accent); }
+    article th {
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      font-family: var(--font-body);
+      font-weight: normal;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+    article td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    article tbody tr:hover td { background: var(--surface2); }
+
+    /* Inline code */
+    article code {
+      font-family: var(--font-mono);
+      font-size: 0.84em;
+      background: var(--code-bg);
+      color: color-mix(in srgb, var(--accent2) 84%, white 16%);
+      padding: 0.16em 0.48em;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    /* Code blocks */
+    article pre {
+      margin: 1.5rem 0;
+      background: var(--code-bg) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      position: relative;
+      box-shadow: 0 18px 40px color-mix(in srgb, var(--bg) 35%, transparent);
+    }
+    article pre code {
+      display: block;
+      padding: 1.1rem 1.25rem;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      background: transparent !important;
+      color: var(--code-text);
+      border: none;
+    }
+    article .copy-code-host {
+      position: relative;
+    }
+    article pre.copy-code-host > code,
+    article .copy-code-host pre code {
+      padding-top: 1.1rem;
+      padding-right: 5.4rem;
+    }
+    article .copy-code-button {
+      position: absolute;
+      top: 0.42rem;
+      right: 0.7rem;
+      z-index: 2;
+      appearance: none;
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--surface2) 92%, transparent);
+      color: var(--text2);
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.22rem 0.5rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      backdrop-filter: blur(8px);
+    }
+    article .copy-code-button:hover,
+    article .copy-code-button:focus-visible {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--accent);
+      outline: none;
+    }
+    article .copy-code-button.copied {
+      color: var(--accent2);
+      border-color: var(--accent);
+    }
+    /* Language badge */
+    article div.sourceCode { position: relative; }
+    article div.sourceCode::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.46rem;
+      left: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+      pointer-events: none;
+      opacity: 0.88;
+    }
+
+    /* Images */
+    article img {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--radius);
+      display: block;
+      margin: 1.5rem auto;
+      box-shadow: 0 18px 45px color-mix(in srgb, var(--bg) 22%, transparent);
+    }
+    article figure { margin: 1.5rem 0; }
+    article figcaption {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text3);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    /* Definition lists */
+    article dt {
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 0.75rem;
+    }
+    article dd {
+      padding-left: 1.25rem;
+      color: var(--text2);
+    }
+
+    /* Mark / highlight */
+    article mark {
+      background: var(--mark-bg);
+      color: color-mix(in srgb, var(--accent2) 92%, white 8%);
+      padding: 0.1em 0.3em;
+      border-radius: 4px;
+    }
+
+    /* ── Syntax highlighting overrides ────────── */
+        html { -webkit-text-size-adjust: 100%; }
+        pre > code.sourceCode { white-space: pre; position: relative; }
+        pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+        pre > code.sourceCode > span:empty { height: 1.2em; }
+        .sourceCode { overflow: visible; }
+        code.sourceCode > span { color: inherit; text-decoration: inherit; }
+        div.sourceCode { margin: 1em 0; }
+        pre.sourceCode { margin: 0; }
+        @media screen {
+        div.sourceCode { overflow: auto; }
+        }
+        @media print {
+        pre > code.sourceCode { white-space: pre-wrap; }
+        pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+        }
+        pre.numberSource code
+          { counter-reset: source-line 0; }
+        pre.numberSource code > span
+          { position: relative; left: -4em; counter-increment: source-line; }
+        pre.numberSource code > span > a:first-child::before
+          { content: counter(source-line);
+            position: relative; left: -1em; text-align: right; vertical-align: baseline;
+            border: none; display: inline-block;
+            -webkit-touch-callout: none; -webkit-user-select: none;
+            -khtml-user-select: none; -moz-user-select: none;
+            -ms-user-select: none; user-select: none;
+            padding: 0 4px; width: 4em;
+            background-color: #232629;
+            color: #7a7c7d;
+          }
+        pre.numberSource { margin-left: 3em; border-left: 1px solid #7a7c7d;  padding-left: 4px; }
+        div.sourceCode
+          { color: #cfcfc2; background-color: #232629; }
+        @media screen {
+        pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+        }
+        code span { color: #cfcfc2; } /* Normal */
+        code span.al { color: #95da4c; background-color: #4d1f24; font-weight: bold; } /* Alert */
+        code span.an { color: #3f8058; } /* Annotation */
+        code span.at { color: #2980b9; } /* Attribute */
+        code span.bn { color: #f67400; } /* BaseN */
+        code span.bu { color: #7f8c8d; } /* BuiltIn */
+        code span.cf { color: #fdbc4b; font-weight: bold; } /* ControlFlow */
+        code span.ch { color: #3daee9; } /* Char */
+        code span.cn { color: #27aeae; font-weight: bold; } /* Constant */
+        code span.co { color: #7a7c7d; } /* Comment */
+        code span.cv { color: #7f8c8d; } /* CommentVar */
+        code span.do { color: #a43340; } /* Documentation */
+        code span.dt { color: #2980b9; } /* DataType */
+        code span.dv { color: #f67400; } /* DecVal */
+        code span.er { color: #da4453; text-decoration: underline; } /* Error */
+        code span.ex { color: #0099ff; font-weight: bold; } /* Extension */
+        code span.fl { color: #f67400; } /* Float */
+        code span.fu { color: #8e44ad; } /* Function */
+        code span.im { color: #27ae60; } /* Import */
+        code span.in { color: #c45b00; } /* Information */
+        code span.kw { color: #cfcfc2; font-weight: bold; } /* Keyword */
+        code span.op { color: #cfcfc2; } /* Operator */
+        code span.ot { color: #27ae60; } /* Other */
+        code span.pp { color: #27ae60; } /* Preprocessor */
+        code span.re { color: #2980b9; background-color: #153042; } /* RegionMarker */
+        code span.sc { color: #3daee9; } /* SpecialChar */
+        code span.ss { color: #da4453; } /* SpecialString */
+        code span.st { color: #f44f4f; } /* String */
+        code span.va { color: #27aeae; } /* Variable */
+        code span.vs { color: #da4453; } /* VerbatimString */
+        code span.wa { color: #da4453; } /* Warning */
+    /* iOS-aligned overrides */
+    pre.sourceCode, div.sourceCode pre { background: var(--code-bg) !important; }
+    code span.kw { color: #ff6b9d; font-weight: 500; }  /* keyword */
+    code span.cf { color: #ff6b9d; }                     /* control flow */
+    code span.dt { color: #5ac8fa; }                     /* data type */
+    code span.dv { color: #ff9f0a; }                     /* decimal val */
+    code span.fl { color: #ff9f0a; }                     /* float */
+    code span.co { color: #636366; font-style: italic; } /* comment */
+    code span.st { color: #30d158; }                     /* string */
+    code span.op { color: #5ac8fa; }                     /* operator */
+    code span.fu { color: #409cff; }                     /* function */
+    code span.va { color: var(--code-text); }            /* variable */
+    code span.at { color: #5ac8fa; }                     /* attribute */
+    code span.an { color: #ff9f0a; }                     /* annotation */
+    code span.do { color: #636366; font-style: italic; } /* doc comment */
+    code span.er { color: #ff453a; font-weight: 500; }   /* error */
+    code span.wa { color: #ff9f0a; }                     /* warning */
+
+    /* ── Theme toggle ───────────────────── */
+    #theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 100;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    #theme-toggle:hover { background: var(--surface); color: var(--text); }
+
+    /* ── Light mode — editorial paper ───────── */
+    body.light {
+      --bg:        #f6f0e6;
+      --surface:   #fffaf2;
+      --surface2:  #efe6d8;
+      --border:    #d7cab7;
+      --border2:   #c5b79f;
+      --text:      #201b16;
+      --text2:     #5c5248;
+      --text3:     #8a7b6a;
+      --accent:    #1851b4;
+      --accent2:   #2f66ca;
+      --link:      #1749a8;
+      --code-bg:   #f2e9dc;
+      --code-text: #231c16;
+      --mark-bg:   rgba(47,102,202,0.12);
+    }
+
+    /* ── Footer ──────────────────────────────── */
+    .doc-footer {
+      width: 100%;
+      max-width: var(--max-w);
+      margin-top: 4rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text3);
+      letter-spacing: 0.04em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .doc-footer a {
+      color: var(--text3);
+      text-decoration: none;
+    }
+    .doc-footer a:hover { color: var(--accent2); }
+
+    /* ── Animation ───────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Scrollbar ───────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* ── Print ───────────────────────────────── */
+    @media print {
+      #toc-sidebar, #theme-toggle { display: none; }
+      body { background: white; color: black; }
+      .content-wrap { padding: 0; }
+      article a { color: inherit; }
+    }
+
+    /* ── Responsive ──────────────────────────── */
+    @media (max-width: 900px) {
+      #toc-sidebar { display: none; }
+      .content-wrap { padding: 1.75rem 1.35rem 4rem; }
+    }
+    @media (max-width: 600px) {
+      :root { --max-w: 100%; }
+      .doc-header h1 { font-size: 1.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+<button id="theme-toggle" title="Toggle light/dark" aria-label="Toggle theme">◑</button>
+
+<div class="page-wrap">
+    <aside id="toc-sidebar">
+    <div class="toc-index-link"><a href="../index.html">← All docs</a></div>
+    <div class="toc-label">Contents</div>
+    <nav><ul>
+<li><a href="#quick-start" id="toc-quick-start">Quick start</a></li>
+<li><a href="#syntax-and-options" id="toc-syntax-and-options">Syntax and options</a>
+<ul>
+<li><a href="#script-safe-output" id="toc-script-safe-output">Script-safe output</a></li>
+</ul></li>
+<li><a href="#finding-valid--name-values" id="toc-finding-valid--name-values">Finding valid <code>-name</code> values</a></li>
+<li><a href="#why-a-value-may-be-null-or-stale" id="toc-why-a-value-may-be-null-or-stale">Why a value may be null or stale</a></li>
+<li><a href="#registered-attribute-catalog" id="toc-registered-attribute-catalog">Registered attribute catalog</a></li>
+<li><a href="#refreshing-this-catalog" id="toc-refreshing-this-catalog">Refreshing this catalog</a></li>
+<li><a href="#related-commands" id="toc-related-commands">Related commands</a></li>
+<li><a href="#local-sources" id="toc-local-sources">Local sources</a></li>
+</ul></nav>
+  </aside>
+
+  <div class="content-wrap">
+        <header class="doc-header">
+      <h1>mdls and Spotlight Metadata Attributes</h1>
+      <div class="doc-meta">
+
+
+        <span>Reference manual</span>
+        <span class="sep">·</span><span>manpage · macOS · cli · Spotlight</span>
+      </div>
+    </header>
+
+    <article>
+      <p><code>mdls</code> prints Spotlight metadata attributes for files and bundles. This manual covers its command-line interface, shows how to discover valid attribute names, and includes the complete attribute registry reported by this Mac when the document was generated.</p>
+      <h2 id="quick-start">Quick start</h2>
+      <p>Print every indexed attribute and value for a file:</p>
+      <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdls</span> <span class="st">&quot;/path/to/file&quot;</span></span></code></pre></div>
+      <p>Print one attribute:</p>
+      <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdls</span> <span class="at">-name</span> kMDItemVersion <span class="st">&quot;/Applications/My App.app&quot;</span></span></code></pre></div>
+      <p>Print several attributes:</p>
+      <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdls</span> <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-name</span> kMDItemDisplayName <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-name</span> kMDItemVersion <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-name</span> kMDItemCFBundleIdentifier <span class="dt">\</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;/Applications/My App.app&quot;</span></span></code></pre></div>
+      <p>For an application bundle, the most useful fields are commonly:</p>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Attribute</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>kMDItemVersion</code></td>
+      <td>User-facing application version indexed by Spotlight</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCFBundleIdentifier</code></td>
+      <td>Bundle identifier, such as <code>com.example.app</code></td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDisplayName</code></td>
+      <td>Localized display name</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemExecutableArchitectures</code></td>
+      <td>Indexed executable architectures</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemContentType</code></td>
+      <td>Uniform Type Identifier (UTI)</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemContentTypeTree</code></td>
+      <td>UTI and its conformance hierarchy</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAppStoreCategory</code></td>
+      <td>App Store category, when present</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemApplicationCategories</code></td>
+      <td>Application category identifiers, when present</td>
+      </tr>
+      </tbody>
+      </table>
+      <p><code>mdls</code> reads the Spotlight index, not <code>Info.plist</code> directly. For authoritative bundle version keys, bypass Spotlight:</p>
+      <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">plist</span><span class="op">=</span><span class="st">&quot;/Applications/My App.app/Contents/Info.plist&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">plutil</span> <span class="at">-extract</span> CFBundleShortVersionString raw <span class="at">--</span> <span class="st">&quot;</span><span class="va">$plist</span><span class="st">&quot;</span>  <span class="co"># release version</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">plutil</span> <span class="at">-extract</span> CFBundleVersion raw <span class="at">--</span> <span class="st">&quot;</span><span class="va">$plist</span><span class="st">&quot;</span>             <span class="co"># build number</span></span></code></pre></div>
+      <h2 id="syntax-and-options">Syntax and options</h2>
+      <pre class="text"><code>mdls [-name attributeName] [-raw [-nullMarker markerString]] file ...</code></pre>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Option</th>
+      <th>Effect</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>-name attributeName</code></td>
+      <td>Print only that attribute. Repeat the option to request multiple attributes.</td>
+      </tr>
+      <tr>
+      <td><code>-raw</code></td>
+      <td>Print values without attribute labels. Multiple fields are separated by an ASCII NUL byte.</td>
+      </tr>
+      <tr>
+      <td><code>-nullMarker markerString</code></td>
+      <td>In raw mode, replace a null value with this string. The default is <code>(null)</code>.</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>Always quote paths containing spaces. A missing or unindexed attribute prints <code>(null)</code> in normal output.</p>
+      <h3 id="script-safe-output">Script-safe output</h3>
+      <p>For one scalar field, command substitution is convenient:</p>
+      <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">version</span><span class="op">=</span><span class="va">$(</span><span class="ex">mdls</span> <span class="at">-raw</span> <span class="at">-nullMarker</span> <span class="st">&#39;&#39;</span> <span class="at">-name</span> kMDItemVersion <span class="st">&quot;/Applications/My App.app&quot;</span><span class="va">)</span></span></code></pre></div>
+      <p>For multiple raw fields, consume NUL delimiters rather than treating the output as lines:</p>
+      <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdls</span> <span class="at">-raw</span> <span class="dt">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-name</span> kMDItemCFBundleIdentifier <span class="dt">\</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-name</span> kMDItemVersion <span class="dt">\</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;/Applications/My App.app&quot;</span> <span class="kw">|</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="at">-d</span> <span class="st">&#39;&#39;</span> <span class="va">value</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">printf</span> <span class="st">&#39;%s\n&#39;</span> <span class="st">&quot;</span><span class="va">$value</span><span class="st">&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+      <p>The <code>mdls(1)</code> manual says raw values follow request order. On macOS 26.4.1, repeated <code>-name</code> output was observed in attribute-name order, so scripts should not map unlabeled multi-value output by position without testing the target OS. Separate one-attribute calls are safer when identity matters.</p>
+      <h2 id="finding-valid--name-values">Finding valid <code>-name</code> values</h2>
+      <p>There is no machine-independent, permanently complete list. Spotlight’s schema is extensible: macOS, Apple applications, and third-party metadata importers can register attributes. Use the installed schema as the authority.</p>
+      <p>List every registered attribute with its localized label, description, and search aliases:</p>
+      <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdimport</span> <span class="at">-A</span></span></code></pre></div>
+      <p>Print only attribute names:</p>
+      <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdimport</span> <span class="at">-A</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="at">-F</span> <span class="st">&quot;&#39;&quot;</span> <span class="st">&#39;{print $2}&#39;</span></span></code></pre></div>
+      <p>Search the registry case-insensitively:</p>
+      <div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdimport</span> <span class="at">-A</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> <span class="st">&#39;version\|bundle&#39;</span></span></code></pre></div>
+      <p>Other useful schema and importer diagnostics:</p>
+      <div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdimport</span> <span class="at">-X</span>   <span class="co"># print the active metadata schema</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mdimport</span> <span class="at">-L</span>   <span class="co"># list installed metadata importers</span></span></code></pre></div>
+      <p>To discover which attributes actually exist on a particular item, omit <code>-name</code>:</p>
+      <div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdls</span> <span class="st">&quot;/path/to/item&quot;</span></span></code></pre></div>
+      <p>To find files by metadata, use <code>mdfind</code>, for example:</p>
+      <div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mdfind</span> <span class="st">&#39;kMDItemCFBundleIdentifier == &quot;com.apple.calculator&quot;&#39;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mdfind</span> <span class="st">&#39;kMDItemVersion == &quot;12.0&quot;&#39;</span></span></code></pre></div>
+      <h2 id="why-a-value-may-be-null-or-stale">Why a value may be null or stale</h2>
+      <ul>
+      <li>The importer for that file type does not produce the attribute.</li>
+      <li>The item has not been indexed yet, or the index is stale.</li>
+      <li>Spotlight indexing is disabled for the volume or location.</li>
+      <li>The attribute is registered globally but applies only to another content type.</li>
+      <li>A bundle’s <code>Info.plist</code> key does not necessarily map to a same-named Spotlight attribute.</li>
+      </ul>
+      <p>Inspect indexing state with <code>mdutil -s /</code>. For direct application-bundle facts, prefer <code>plutil</code> as shown above.</p>
+      <h2 id="registered-attribute-catalog">Registered attribute catalog</h2>
+      <p>Generated on 2026-08-08 from <code>mdimport -A</code> on macOS 26.4.1 (build 25E253). It contains <strong>317 attributes</strong>. “Label,” “description,” and “aliases” are the localized values returned by the system; an em dash means the registry returned <code>(null)</code>. Private names beginning with <code>_</code> and vendor-prefixed names are included because they are accepted registered attributes on this Mac, but they are not stable public API.</p>
+      <table>
+      <colgroup>
+      <col style="width: 25%" />
+      <col style="width: 25%" />
+      <col style="width: 25%" />
+      <col style="width: 25%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Attribute (<code>-name</code> value)</th>
+      <th>Label</th>
+      <th>Description</th>
+      <th>Search aliases</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>MessageGUIDs</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemContactIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemDomainIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsCommunicationNotification</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsFromMe</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsGroupThread</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsNew</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsShared</code></td>
+      <td>Is shared</td>
+      <td>Whether this file is shared via iCloud</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsTemplateApp</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsTwoFactorCode</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsUrgent</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemIsWindowTabEntity</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMailCategories</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMailCategoryType</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMailVIP</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMediaEmbeddingVersion</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMediaTimeRangeEmbeddings</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessageEffectType</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessageFromKnownSender</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessageMentionedAddresses</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessagePinned</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessageRead</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessageService</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessageTapbackStringValue</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessageTapbackType</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemMessageType</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemNotificationCritical</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemNotificationTimeSensitive</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemOwnerName</code></td>
+      <td>Shared file owner</td>
+      <td>The owner of this shared file</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemPersonIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemPersonIdentifiers</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemPhotoEmbedding</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemPhotosIdentificationDocumentsVersion</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemPrimaryTextEmbedding</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemRequiresMediaAnalysis</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemRequiresMediaComplete</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSecondaryTextEmbedding</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSharedItemCurrentUserRole</code></td>
+      <td>User role</td>
+      <td>The role of the current user pertaining to this file (owner or participant)</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSharedProjectID</code></td>
+      <td>Shared project ID</td>
+      <td>The project ID of this shared item</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSmartRepliesResponse</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSmartRepliesStatus</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSummarizationContentSynopsis</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSummarizationContentTopLine</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSummarizationContentTopic</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSummarizationStatus</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemSummarizedIdentifiers</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemTapbackAssociatedMessageID</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemTextChunkTokenLength</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemThreadIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemTimeSensitiveStatus</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemURLCanBeHiddenBySystem</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemUrgencyStatus</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>_kMDItemUserTags</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_ats_name_family</code></td>
+      <td>Family name</td>
+      <td>Font Family name</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_ats_name_fond</code></td>
+      <td>FOND name</td>
+      <td>FOND name</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_ats_name_full</code></td>
+      <td>Full name</td>
+      <td>Font Full name</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_ats_name_postscript</code></td>
+      <td>PostScript name</td>
+      <td>PostScript name</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_ats_name_style</code></td>
+      <td>Style name</td>
+      <td>Font Style name</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_ats_names</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_garageband_metadata_numberOfRITracks</code></td>
+      <td>Real instrument tracks</td>
+      <td>Number of real instrument tracks in GarageBand song</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_garageband_metadata_numberOfSITracks</code></td>
+      <td>Software instrument tracks</td>
+      <td>Number of software instrument tracks in GarageBand song</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_garageband_metadata_parentalAdvisory</code></td>
+      <td>Parental advisory</td>
+      <td>GarageBand parental advisory</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_garageband_metadata_projectType</code></td>
+      <td>Type</td>
+      <td>GarageBand project type</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_garageband_metadata_songVersionNumber</code></td>
+      <td>Created with version</td>
+      <td>The GarageBand version used to create this song</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_iCal_Bookmark_SharedUID</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_attachmentKinds</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_attachmentNames</code></td>
+      <td>Attachment Names</td>
+      <td>A list of the names of attachments associated with a message</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_attachmentSpecificTypes</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_attachmentTypes</code></td>
+      <td>Attachment Types</td>
+      <td>A list of the types for attachments associated with a message</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_dateLastViewed</code></td>
+      <td>Date Last Viewed</td>
+      <td>The date a message was last viewed</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_dateReceived</code></td>
+      <td>Date Received</td>
+      <td>The date a message was received</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_flagColor</code></td>
+      <td>Flag Color</td>
+      <td>The color of the flag associated with a message</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_flagged</code></td>
+      <td>Flagged</td>
+      <td>Whether or not a message is flagged</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_messageID</code></td>
+      <td>Message ID</td>
+      <td>The message ID from the message header</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_priority</code></td>
+      <td>Priority</td>
+      <td>The numbered priority of a message</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_read</code></td>
+      <td>Read Status</td>
+      <td>Whether or not a message has been read</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_mail_repliedTo</code></td>
+      <td>Replied To</td>
+      <td>Whether or not a message has been replied to</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_xcode_dsym_paths</code></td>
+      <td>dSYM paths</td>
+      <td>dSYM bundle relative paths corresponding to each UUID value</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_apple_xcode_dsym_uuids</code></td>
+      <td>dSYM UUIDs</td>
+      <td>UUID values for all CPU types and subtypes in a dSYM bundle</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_clip_anamorphic</code></td>
+      <td>Anamorphic</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_clip_braw_compression_ratio</code></td>
+      <td>Compression Ratio</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_clip_camera_type</code></td>
+      <td>Camera Type</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_clip_firmware_version</code></td>
+      <td>Camera Firmware Version</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_clip_lens_type</code></td>
+      <td>Lens Type</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_clip_resolution</code></td>
+      <td>Clip Resolution</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_clip_rotation</code></td>
+      <td>Rotation</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_clip_sensor_area_captured</code></td>
+      <td>Sensor Area Captured</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_frame0_aperture</code></td>
+      <td>Aperture</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_frame0_focal_length</code></td>
+      <td>Focal Length</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_frame0_internal_nd</code></td>
+      <td>Internal ND</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_frame0_iso</code></td>
+      <td>ISO</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_frame0_sensor_rate</code></td>
+      <td>Sensor Rate</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_frame0_shutter_value</code></td>
+      <td>Shutter</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_frame0_white_balance_kelvin</code></td>
+      <td>White Balance Kelvin</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>com_blackmagic_design_braw_movie_frame0_white_balance_tint</code></td>
+      <td>White Balance Tint</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAccountIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAcquisitionMake</code></td>
+      <td>Device make</td>
+      <td>Make of the device used to acquire this document</td>
+      <td>make</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAcquisitionModel</code></td>
+      <td>Device model</td>
+      <td>Model of the device used to acquire this document</td>
+      <td>model</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAdditionalRecipientEmailAddresses</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAlbum</code></td>
+      <td>Album</td>
+      <td>Title for a collection of media, such as a record album</td>
+      <td>album, title</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAlternateNames</code></td>
+      <td>Alternate display names</td>
+      <td>Alternate names of the file</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAltitude</code></td>
+      <td>Altitude</td>
+      <td>The altitude of the item in meters above sea level, expressed using the WGS84 datum. Negative values lie below sea level.</td>
+      <td>altitude</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAperture</code></td>
+      <td>Aperture value</td>
+      <td>Size of the lens aperture as a log-scale APEX value</td>
+      <td>aperture, fstop</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAppStoreCategory</code></td>
+      <td>Category</td>
+      <td>App Store Category item is a member of</td>
+      <td>category</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAppStoreCategoryType</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAppleLoopDescriptors</code></td>
+      <td>Loop descriptors</td>
+      <td>Keywords describing the mood and other aspects of the loop</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAppleLoopsKeyFilterType</code></td>
+      <td>Loop scale type</td>
+      <td>Whether the loop uses the major or minor scale, neither scale, or can be used with both</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAppleLoopsLoopMode</code></td>
+      <td>Loop file type</td>
+      <td>Whether the file is a looping or non-looping file. Looping files adjust their tempo to the song tempo, while non-looping files keep their recorded tempo</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAppleLoopsRootKey</code></td>
+      <td>Loop original key</td>
+      <td>Shows the loop’s original key. The key is the root note or tonic for the loop, and does not include the scale type</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemApplicationCategories</code></td>
+      <td>Application Categories</td>
+      <td>Categories application is a member of</td>
+      <td>categories</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAttributeChangeDate</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAudiences</code></td>
+      <td>Audiences</td>
+      <td>Who the document is intended for</td>
+      <td>to, audience</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAudioBitRate</code></td>
+      <td>Audio bit rate</td>
+      <td>Bit rate of the audio in the media</td>
+      <td>audiobitrate, bitrate</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAudioChannelCount</code></td>
+      <td>Audio channels</td>
+      <td>Number of channels in the file’s audio data</td>
+      <td>channels</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAudioEncodingApplication</code></td>
+      <td>Audio encoding application</td>
+      <td>Name of the application that encoded the data in the audio file</td>
+      <td>encoder, encodedby, audioencodingapplication</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAudioSampleRate</code></td>
+      <td>Sample rate</td>
+      <td>Sample rate of the file’s audio data</td>
+      <td>audiosamplerate, samplerate</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAudioTrackNumber</code></td>
+      <td>Track number</td>
+      <td>Track number of the song that is part of an album</td>
+      <td>tracknumber</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAuthorAddresses</code></td>
+      <td>Author addresses</td>
+      <td>Addresses for authors of this item</td>
+      <td>from</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAuthorContactIdentifiers</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAuthorEmailAddresses</code></td>
+      <td>Author Email addresses</td>
+      <td>Email addresses for authors of this item</td>
+      <td>from, email, mail</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemAuthors</code></td>
+      <td>Authors</td>
+      <td>Authors of this item</td>
+      <td>from, author, with, by</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemBitsPerSample</code></td>
+      <td>Bits per sample</td>
+      <td>Number of bits per sample</td>
+      <td>bitspersample, bps</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemBundleIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCFBundleIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCalendarDelegateIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCalendarHolidayIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCity</code></td>
+      <td>City</td>
+      <td>City of the item</td>
+      <td>city</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCodecs</code></td>
+      <td>Codecs</td>
+      <td>Codecs used to encode and decode the media</td>
+      <td>codec</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemColorSpace</code></td>
+      <td>Color space</td>
+      <td>Color space model of this image</td>
+      <td>colorspace</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemComment</code></td>
+      <td>Comment</td>
+      <td>Comments about this item</td>
+      <td>comment</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemComposer</code></td>
+      <td>Composer</td>
+      <td>Composer of the song in the audio file</td>
+      <td>by, composer, author</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemContactKeywords</code></td>
+      <td>Contact keywords</td>
+      <td>Contacts associated with this item</td>
+      <td>contact, contactkeyword, keyword</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemContentCreationDate</code></td>
+      <td>Content created</td>
+      <td>Date when the content of this item was created</td>
+      <td>contentcreated, created, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemContentModificationDate</code></td>
+      <td>Content modified</td>
+      <td>Date when the content of this item was modified</td>
+      <td>contentmodified, modified, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemContentType</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemContentTypeTree</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemContributors</code></td>
+      <td>Contributors</td>
+      <td>People or organizations contributing to the content of the document</td>
+      <td>by, contributor, author, with</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCopyright</code></td>
+      <td>Copyright</td>
+      <td>Copyright information about this item</td>
+      <td>copyright</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCountry</code></td>
+      <td>Region</td>
+      <td>Country, region, or location where the item was created according to the provider</td>
+      <td>country, region</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCoverage</code></td>
+      <td>Coverage</td>
+      <td>Extent or scope of the content of the document</td>
+      <td>coverage</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemCreator</code></td>
+      <td>Content Creator</td>
+      <td>Application used to create the document</td>
+      <td>creator</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDateAdded</code></td>
+      <td>Date added</td>
+      <td>Date when this item was last moved</td>
+      <td>dateadded, added, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDeliveryType</code></td>
+      <td>Delivery type</td>
+      <td>Method used to deliver the media (Fast Start or RTSP)</td>
+      <td>delivery</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDescription</code></td>
+      <td>Description</td>
+      <td>Description of the content of the document</td>
+      <td>description, comment</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDestinationRecipients</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDirector</code></td>
+      <td>Director</td>
+      <td>Director</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDisableSearchInSpotlight</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDisplayName</code></td>
+      <td>Display name</td>
+      <td>Localized name of the file</td>
+      <td>name, displayname</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDocumentContainer</code></td>
+      <td>Document Container</td>
+      <td>Containing folder of item</td>
+      <td>container</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDocumentLineage</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDueDate</code></td>
+      <td>Due date</td>
+      <td>Date this item is due</td>
+      <td>duedate, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemDurationSeconds</code></td>
+      <td>Duration</td>
+      <td>Duration of this item in seconds</td>
+      <td>duration, time</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEXIFGPSVersion</code></td>
+      <td>EXIF GPS version</td>
+      <td>The version of GPSInfoIFD in EXIF used to generate the metadata</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEXIFVersion</code></td>
+      <td>EXIF version</td>
+      <td>Version of EXIF used to generate the metadata</td>
+      <td>exifversion</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEditors</code></td>
+      <td>Editors</td>
+      <td>Editors of this item</td>
+      <td>editor</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEmailAddresses</code></td>
+      <td>Email addresses</td>
+      <td>Email addresses associated with this item</td>
+      <td>email, mail</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEmailCategory</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEmailConversationID</code></td>
+      <td>Conversation ID</td>
+      <td>The conversation ID assigned to the message</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEmbeddingVersion</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEncodingApplications</code></td>
+      <td>Encoding software</td>
+      <td>Software used to convert the original content</td>
+      <td>encoder, encodedby, encodingapplication</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemEndDate</code></td>
+      <td>End date</td>
+      <td>Date this item ends</td>
+      <td>enddate, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemExecutableArchitectures</code></td>
+      <td>Executable Architectures</td>
+      <td>Architectures the item requires to execute</td>
+      <td>architectures</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemExecutablePlatform</code></td>
+      <td>Executable Platform</td>
+      <td>Platform the item requires to execute</td>
+      <td>platform</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemExposureMode</code></td>
+      <td>Exposure mode</td>
+      <td>Mode used for the exposure</td>
+      <td>exposuremode</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemExposureProgram</code></td>
+      <td>Exposure program</td>
+      <td>Type of program used by the camera to set the exposure: Manual, Normal, Aperture priority, …</td>
+      <td>exposure, exposureprogram</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemExposureTimeSeconds</code></td>
+      <td>Exposure time</td>
+      <td>Time the lens was open during exposure</td>
+      <td>exposuretime, time</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFNumber</code></td>
+      <td>F number</td>
+      <td>Focal length of the lens divided by the diameter of the aperture</td>
+      <td>fnumber, fstop</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSContentChangeDate</code></td>
+      <td>Modified</td>
+      <td>Date the file content was last changed</td>
+      <td>modified</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSCreationDate</code></td>
+      <td>Created</td>
+      <td>Date the file was created</td>
+      <td>created</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSExists</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSHasCustomIcon</code></td>
+      <td>Custom Icon</td>
+      <td>Whether the file has a custom icon</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSInvisible</code></td>
+      <td>File invisible</td>
+      <td>Whether the file is visible</td>
+      <td>invisible</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSIsExtensionHidden</code></td>
+      <td>File extension hidden</td>
+      <td>Whether the file extension is hidden</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSIsReadable</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSIsStationery</code></td>
+      <td>Stationery</td>
+      <td>Whether the file is stationery</td>
+      <td>stationery</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSIsWriteable</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSLabel</code></td>
+      <td>File label</td>
+      <td>Finder label assigned to the file</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSName</code></td>
+      <td>Filename</td>
+      <td>Name of the file</td>
+      <td>filename</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSNodeCount</code></td>
+      <td>Number of items</td>
+      <td>Number of files and folders in the folder</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSOwnerGroupID</code></td>
+      <td>Group</td>
+      <td>Group ID of owner of the file</td>
+      <td>group</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSOwnerUserID</code></td>
+      <td>Owner</td>
+      <td>User ID of the owner of the file</td>
+      <td>owner</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFSSize</code></td>
+      <td>File size</td>
+      <td>Logical size of the file on disk in bytes</td>
+      <td>size</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFinderComment</code></td>
+      <td>Spotlight comment</td>
+      <td>Spotlight comment for this item</td>
+      <td>comment, spotlightcomment</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFinderOpenDate</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFlashOnOff</code></td>
+      <td>Flash</td>
+      <td>Whether the picture was taken using a flash</td>
+      <td>flash</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFocalLength</code></td>
+      <td>Focal length</td>
+      <td>Focal length of the lens in millimeters (mm)</td>
+      <td>focallength</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemFonts</code></td>
+      <td>Fonts</td>
+      <td>Fonts used in this item</td>
+      <td>font</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemGenre</code></td>
+      <td>Genre</td>
+      <td>Genre</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemHasAlphaChannel</code></td>
+      <td>Alpha channel</td>
+      <td>Whether the image has an Alpha channel</td>
+      <td>alpha</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemHeadline</code></td>
+      <td>Headline</td>
+      <td>Publishable summary of the contents of the item</td>
+      <td>headline, title</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemHiddenAdditionalRecipientEmailAddresses</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemISOSpeed</code></td>
+      <td>ISO speed</td>
+      <td>ISO speed of the camera when the picture was taken</td>
+      <td>iso</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemIdentifier</code></td>
+      <td>Identifier</td>
+      <td>Reference to a resource within a given context</td>
+      <td>id</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemInformation</code></td>
+      <td>Movie information</td>
+      <td>Movie information</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemInstantMessageAddresses</code></td>
+      <td>Instant message addresses</td>
+      <td>Instant message addresses associated with this item</td>
+      <td>chat, imname</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemInstructions</code></td>
+      <td>Instructions</td>
+      <td>Other information concerning the item, such as handling instructions</td>
+      <td>instructions</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemIsApplicationManaged</code></td>
+      <td>Is Application Managed</td>
+      <td>The file is owned and managed by an application</td>
+      <td>appmanaged</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemIsGeneralMIDISequence</code></td>
+      <td>General MIDI sequence</td>
+      <td>Whether the MIDI sequence contained in the file is setup for use with a General MIDI device</td>
+      <td>ismidi</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemIsLikelyJunk</code></td>
+      <td>Is Junk</td>
+      <td>Whether the file is likely to be considered a junk file</td>
+      <td>isjunk</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemIsPriority</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemIsQuarantined</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemIsScreenCapture</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemIsTimeSensitive</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemKeySignature</code></td>
+      <td>Key signature</td>
+      <td>Musical key of the song in the audio file</td>
+      <td>key, keysignature</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemKeyphraseConfidences</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemKeyphraseLabels</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemKeyphraseVersion</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemKeywords</code></td>
+      <td>Keywords</td>
+      <td>Keywords associated with this item</td>
+      <td>keyword</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemKind</code></td>
+      <td>Kind</td>
+      <td>Kind of this item</td>
+      <td>kind</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLanguages</code></td>
+      <td>Languages</td>
+      <td>Languages of the content of the document</td>
+      <td>language</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLastUsedDate</code></td>
+      <td>Last opened</td>
+      <td>Date when this item was last used</td>
+      <td>lastused, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLatitude</code></td>
+      <td>Latitude</td>
+      <td>The latitude of the item in degrees north of the equator, expressed using the WGS84 datum. Negative values lie south of the equator.</td>
+      <td>latitude</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLayerNames</code></td>
+      <td>Layers</td>
+      <td>Names of the layers in the file</td>
+      <td>layer</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLensModel</code></td>
+      <td>Lens model</td>
+      <td>Model of the lens used to acquire this document</td>
+      <td>lens</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLogicSongAlternatives</code></td>
+      <td>Alternatives</td>
+      <td>Alternatives contained in Logic project</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLogicSongUsedAudioFiles</code></td>
+      <td>Used Audio Files</td>
+      <td>Audio Files used by Logic project</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLogicSongUsedEXSInstruments</code></td>
+      <td>Used Sampler Instruments</td>
+      <td>Sampler Instruments used by Logic project</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLogicSongUsedImpulseResponses</code></td>
+      <td>Used Impulse Responses</td>
+      <td>Impulse Responses used by Logic project</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLogicSongUsedUltrabeatFiles</code></td>
+      <td>Used Ultrabeat Audio Files</td>
+      <td>Audio Files used by Ultrabeat within Logic project</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLogicSongUsedVideoFiles</code></td>
+      <td>Used Video Files</td>
+      <td>Video Files used by Logic project</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLogicalSize</code></td>
+      <td>Logical size</td>
+      <td>Logical size of the item in bytes</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLongitude</code></td>
+      <td>Longitude</td>
+      <td>The longitude of the item in degrees east of the prime meridian, expressed using the WGS84 datum. Negative values lie west of the prime meridian.</td>
+      <td>longitude</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemLyricist</code></td>
+      <td>Lyricist</td>
+      <td>Lyricist of the song in the audio file</td>
+      <td>by, lyricist, author</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMailboxes</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMaxAperture</code></td>
+      <td>Max aperture</td>
+      <td>Smallest F number of the lens in APEX value units, usually in the range of 00.00 to 99.99</td>
+      <td>maxaperture</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMediaAnalysTimeRangeData</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMediaExtensions</code></td>
+      <td>Media extensions</td>
+      <td>Media extensions used to decode the media</td>
+      <td>extensions</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMediaTypes</code></td>
+      <td>Media types</td>
+      <td>Media types present in the content</td>
+      <td>media, contains, mediatype</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMeteringMode</code></td>
+      <td>Metering mode</td>
+      <td>The metering mode (Unknown, Average, CenterWeightedAverage, Spot, MultiSpot, Pattern, Partial)</td>
+      <td>metering, meteringmode</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMusicalGenre</code></td>
+      <td>Musical genre</td>
+      <td>Musical genre of the song in the audio file</td>
+      <td>genre, musicalgenre</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMusicalInstrumentCategory</code></td>
+      <td>Instrument category</td>
+      <td>Instrument category to which the file belongs</td>
+      <td>instrument, instrumentcategory</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemMusicalInstrumentName</code></td>
+      <td>Instrument name</td>
+      <td>Name of instrument relative to the instrument category</td>
+      <td>instrument, instrumentname</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemNamedLocation</code></td>
+      <td>Location</td>
+      <td>Name of the location or point of interest</td>
+      <td>location</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemNumberOfPages</code></td>
+      <td>Pages</td>
+      <td>Number of pages in the document</td>
+      <td>pages</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOrganizations</code></td>
+      <td>Organizations</td>
+      <td>Organizations that created the document</td>
+      <td>organization</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOrientation</code></td>
+      <td>Orientation</td>
+      <td>Orientation of the picture (landscape or portrait)</td>
+      <td>orientation</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOriginApplicationIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOriginMessageIDkMDItemOriginMessageID</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOriginSenderDisplayName</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOriginSenderHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOriginSubject</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOriginalFormat</code></td>
+      <td>Original Format</td>
+      <td>Original Format</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemOriginalSource</code></td>
+      <td>Original Source</td>
+      <td>Original Source</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPageHeight</code></td>
+      <td>Page height</td>
+      <td>Height of the document page in points</td>
+      <td>pageheight, height</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPageWidth</code></td>
+      <td>Page width</td>
+      <td>Width of the document page in points</td>
+      <td>pagewidth, width</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemParticipants</code></td>
+      <td>Participants</td>
+      <td>Participants in this item</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPath</code></td>
+      <td>File pathname</td>
+      <td>Complete pathname of this file</td>
+      <td>path</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPerformers</code></td>
+      <td>Performers</td>
+      <td>Performers</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPhoneNumbers</code></td>
+      <td>Phone number</td>
+      <td>Phone numbers associated with this item</td>
+      <td>phone, phonenumber</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPhysicalSize</code></td>
+      <td>Physical size</td>
+      <td>Physical size of the item in bytes</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPixelCount</code></td>
+      <td>Pixel count</td>
+      <td>Total number of pixels in the document</td>
+      <td>pixelcount</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPixelHeight</code></td>
+      <td>Pixel height</td>
+      <td>Height of the document in pixels</td>
+      <td>pixelheight, height</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPixelWidth</code></td>
+      <td>Pixel width</td>
+      <td>Width of the document in pixels</td>
+      <td>pixelwidth, width</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPrimaryRecipientEmailAddresses</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPriorityStatus</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemProducer</code></td>
+      <td>Producer</td>
+      <td>Producer of this item</td>
+      <td>producer</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemProfileName</code></td>
+      <td>Color profile</td>
+      <td>Name of the color profile used for the image</td>
+      <td>profile</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemProjects</code></td>
+      <td>Projects</td>
+      <td>Projects this item is part of</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPublishers</code></td>
+      <td>Publishers</td>
+      <td>Publisher of the document</td>
+      <td>publisher</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemPurchaseDate</code></td>
+      <td>Purchase Date</td>
+      <td>Date this item was purchased</td>
+      <td>purchasedate</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRecipientAddresses</code></td>
+      <td>Recipient addresses</td>
+      <td>Addresses for recipients of this item</td>
+      <td>to</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRecipientContactIdentifiers</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRecipientEmailAddresses</code></td>
+      <td>Recipient Email addresses</td>
+      <td>Email addresses for recipients of this item</td>
+      <td>to, email, mail</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRecipients</code></td>
+      <td>Recipients</td>
+      <td>Recipients of this item</td>
+      <td>to, recipient, with</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRecordingDate</code></td>
+      <td>Recording date</td>
+      <td>Date the song was recorded</td>
+      <td>recordingdate, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRecordingYear</code></td>
+      <td>Year recorded</td>
+      <td>Year the item was recorded</td>
+      <td>yearrecorded, year</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRedEyeOnOff</code></td>
+      <td>Red eye</td>
+      <td>Whether ‘red eye’ correction was on or off</td>
+      <td>redeye</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRelatedUniqueIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemResolutionHeightDPI</code></td>
+      <td>Resolution height</td>
+      <td>Resolution height of this image in DPI</td>
+      <td>heightdpi, dpi</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemResolutionWidthDPI</code></td>
+      <td>Resolution width</td>
+      <td>Resolution width of this image in DPI</td>
+      <td>widthdpi, dpi</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemRights</code></td>
+      <td>Rights</td>
+      <td>Link to information about the rights held on the document</td>
+      <td>rights</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemScreenCaptureType</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemSecurityMethod</code></td>
+      <td>Security</td>
+      <td>Encryption method used to make the document secure</td>
+      <td>security, securitymethod</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemStarRating</code></td>
+      <td>Rating</td>
+      <td>User Rating</td>
+      <td>starrating</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemStartDate</code></td>
+      <td>Start date</td>
+      <td>Date this item starts</td>
+      <td>startdate, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemStateOrProvince</code></td>
+      <td>State or Province</td>
+      <td>State or province of the item according to the provider</td>
+      <td>state, province</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemStreamable</code></td>
+      <td>Streamable</td>
+      <td>Whether the content is prepared for streaming</td>
+      <td>streamable</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemSubject</code></td>
+      <td>Subject</td>
+      <td>Subject of this item</td>
+      <td>subject, title, name</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemSupportFileType</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemTempo</code></td>
+      <td>Tempo</td>
+      <td>Tempo of the music in the audio file in Beats Per Minute</td>
+      <td>tempo</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemTextContent</code></td>
+      <td>Text content</td>
+      <td>Text content of this item</td>
+      <td>content, contains, intext</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemTextContentSummary</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemTextVector</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemTheme</code></td>
+      <td>Theme</td>
+      <td>Theme of this item</td>
+      <td>theme</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemTimeSignature</code></td>
+      <td>Time signature</td>
+      <td>Time signature of the song in the audio or MIDI file</td>
+      <td>timesignature</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemTitle</code></td>
+      <td>Title</td>
+      <td>Title of this item</td>
+      <td>title</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemTotalBitRate</code></td>
+      <td>Total bit rate</td>
+      <td>Combined bit rate of the audio and video in the media</td>
+      <td>totalbitrate, bitrate</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemURL</code></td>
+      <td>URL</td>
+      <td>URL of this item</td>
+      <td>url</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUsedDates</code></td>
+      <td>Used dates</td>
+      <td>Dates when this item was used</td>
+      <td>used, date</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserCreatedDate</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserCreatedUserHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserDownloadedDate</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserDownloadedUserHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserModifiedDate</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserModifiedUserHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserPrintedDate</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserPrintedUserHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedReceivedDate</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedReceivedRecipient</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedReceivedRecipientHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedReceivedSender</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedReceivedSenderHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedReceivedTransport</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedSentDate</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedSentRecipient</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedSentRecipientHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedSentSender</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedSentSenderHandle</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserSharedSentTransport</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemUserTags</code></td>
+      <td>Tags</td>
+      <td>Tags associated with this item</td>
+      <td>tag</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemVersion</code></td>
+      <td>Version</td>
+      <td>Version number of this item</td>
+      <td>version</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemVideoBitRate</code></td>
+      <td>Video bit rate</td>
+      <td>Bit rate of the video in the media</td>
+      <td>videobitrate, bitrate</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemWeakRelatedUniqueIdentifier</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemWhereFroms</code></td>
+      <td>Where from</td>
+      <td>Where the item came from</td>
+      <td>from, source, wherefrom</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemWhiteBalance</code></td>
+      <td>White balance</td>
+      <td>White balance setting of the camera when the picture was taken</td>
+      <td>whitebalance</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemXMPCredit</code></td>
+      <td>Credit</td>
+      <td>Photo metadata credit line</td>
+      <td>xmpCredit</td>
+      </tr>
+      <tr>
+      <td><code>kMDItemXMPDigitalSourceType</code></td>
+      <td>Content Creator</td>
+      <td>Photo metadata digital source type</td>
+      <td>xmpDigitalSourceType</td>
+      </tr>
+      </tbody>
+      </table>
+      <h2 id="refreshing-this-catalog">Refreshing this catalog</h2>
+      <p>Because the registry changes with macOS and installed software, regenerate or compare the live list with <code>mdimport -A</code>. The catalog above is a snapshot, not a compatibility promise. For portable scripts, use documented <code>kMDItem…</code> attributes, tolerate nulls, and test on every supported macOS release.</p>
+      <h2 id="related-commands">Related commands</h2>
+      <ul>
+      <li><code>mdfind(1)</code> searches the Spotlight metadata store.</li>
+      <li><code>mdimport(1)</code> inspects importers and the active metadata schema.</li>
+      <li><code>mdutil(1)</code> manages and reports Spotlight indexing status.</li>
+      <li><code>plutil(1)</code> reads property lists directly and is preferable for exact bundle keys.</li>
+      <li><code>xattr(1)</code> reads filesystem extended attributes; those are distinct from Spotlight metadata.</li>
+      </ul>
+      <h2 id="local-sources">Local sources</h2>
+      <p>This reference was derived from the local <code>mdls(1)</code> and <code>mdimport(1)</code> manual pages and the active <code>mdimport -A</code> registry on the system identified above.</p>
+    </article>
+
+    <footer class="doc-footer">
+      <span>Generated by <code>pandoc</code></span>
+      <a href="../index.html">← All docs</a>
+    </footer>
+  </div>
+</div>
+
+<script>
+  // ── Theme toggle ─────────────────────────────
+  const btn = document.getElementById('theme-toggle');
+  const stored = localStorage.getItem('mdoc-theme');
+  if (stored === 'light') document.body.classList.add('light');
+  btn.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light');
+    localStorage.setItem('mdoc-theme', isLight ? 'light' : 'dark');
+  });
+
+  // ── Active TOC tracking ───────────────────────
+  const headings = Array.from(document.querySelectorAll('article h1, article h2, article h3'));
+  const tocLinks = Array.from(document.querySelectorAll('#toc-sidebar nav a'));
+
+  if (headings.length && tocLinks.length) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          tocLinks.forEach(a => a.classList.remove('active'));
+          const active = tocLinks.find(a => a.getAttribute('href') === '#' + e.target.id);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    headings.forEach(h => io.observe(h));
+  }
+
+  // ── Annotate source blocks with language ─────
+  document.querySelectorAll('div.sourceCode').forEach(div => {
+    const cls = Array.from(div.querySelector('pre code')?.classList || []);
+    const lang = cls.find(c => c.startsWith('language-'))?.replace('language-', '');
+    if (lang) div.setAttribute('data-lang', lang);
+  });
+
+  // ── Copy buttons for code blocks ────────────
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+  }
+
+  document.querySelectorAll('article pre > code').forEach(code => {
+    const pre = code.closest('pre');
+    if (!pre) return;
+
+    const host = pre.parentElement?.matches('div.sourceCode') ? pre.parentElement : pre;
+    if (!host || host.querySelector(':scope > .copy-code-button')) return;
+
+    host.classList.add('copy-code-host');
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code-button';
+    button.setAttribute('aria-label', 'Copy code to clipboard');
+    button.textContent = 'Copy';
+
+    button.addEventListener('click', async () => {
+      const originalText = button.textContent;
+
+      try {
+        await copyText(code.textContent.replace(/\n$/, ''));
+        button.textContent = 'Copied';
+        button.classList.add('copied');
+      } catch (_) {
+        button.textContent = 'Failed';
+      }
+
+      window.setTimeout(() => {
+        button.textContent = originalText;
+        button.classList.remove('copied');
+      }, 1400);
+    });
+
+    host.appendChild(button);
+  });
+</script>
+</body>
+</html>

@@ -1,3 +1,12 @@
+---
+title: Zsh Options Reference
+tags:
+  - manpage
+  - zsh
+  - cli
+  - config
+---
+
 A concise, example-driven explanation of every zsh option, in the same groups and order as the `zshoptions(1)` man page (zsh 5.9). Each entry lists what the option does, a short example, and a scenario where it's useful.
 
 **How to read the markers:** `<D>` = on by default in all emulations; `<C>` `<K>` `<S>` `<Z>` = on by default only in csh, ksh, sh, or zsh emulation respectively. A `(-x)` after a name is the single-letter form. Set with `setopt NAME`, clear with `unsetopt NAME` (or `setopt NO_NAME`). Option names are case-insensitive and ignore underscores, so `allexport`, `ALL_EXPORT`, and `A__lleXP_ort` are all the same.

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="pandoc">
+  <title>Reference Manuals by Tag</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0b1020; --panel:#11192a; --panel2:#172239; --line:#2a3550; --text:#edf2f9; --muted:#9aabc5; --accent:#7db1ff; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 system-ui,sans-serif; }
+    main { width:min(1050px,calc(100% - 2rem)); margin:0 auto; padding:4rem 0 7rem; }
+    h1 { margin:0; font-size:clamp(2.3rem,7vw,4.4rem); line-height:1; letter-spacing:-.05em; }
+    .intro { max-width:70ch; color:var(--muted); margin:1.3rem 0 2rem; }
+    .summary { color:var(--muted); font-size:.88rem; }
+    .controls { position:sticky; top:0; z-index:2; padding:1rem 0; background:color-mix(in srgb,var(--bg) 92%,transparent); backdrop-filter:blur(12px); }
+    input { width:100%; padding:.9rem 1rem; border:1px solid var(--line); border-radius:.65rem; color:var(--text); background:var(--panel); font:inherit; }
+    input:focus { outline:2px solid var(--accent); outline-offset:2px; }
+    .cloud { display:flex; flex-wrap:wrap; gap:.55rem; margin:1.2rem 0 3rem; }
+    button { border:1px solid var(--line); border-radius:999px; padding:.48rem .8rem; color:var(--accent); background:var(--panel); cursor:pointer; }
+    button:hover,button[aria-pressed="true"] { background:var(--accent); color:var(--bg); }
+    button span { opacity:.7; margin-left:.35rem; }
+    .tag-group { margin:0 0 3rem; scroll-margin-top:6rem; }
+    .tag-group h2 { display:flex; align-items:baseline; gap:.6rem; padding-bottom:.5rem; border-bottom:1px solid var(--line); }
+    .count { color:var(--muted); font-size:.78rem; font-weight:400; }
+    .docs { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:.75rem; }
+    .doc { padding:1rem; border:1px solid var(--line); border-radius:.7rem; background:var(--panel); }
+    .doc a { color:var(--text); font-weight:650; text-decoration:none; }
+    .doc a:hover { color:var(--accent); }
+    .path { display:block; color:var(--muted); font: .72rem/1.4 ui-monospace,monospace; margin-top:.3rem; }
+    .empty { color:var(--muted); display:none; }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Reference Manuals by Tag</h1>
+      <div class="intro"><p>Browse the complete reference-manual collection by tag. Use the tag cloud or the text filter to narrow the static catalog; no server is required.</p></div>
+      <p class="summary">2 documents across 6 tags · <a href="index.html" style="color:var(--accent)">standard index</a></p>
+    </header>
+    <div class="controls">
+      <label for="filter">Filter documents</label>
+      <input id="filter" type="search" placeholder="Title, path, or tag…" autocomplete="off">
+    </div>
+    <nav class="cloud" aria-label="Tag cloud">
+      <button type="button" data-tag="" aria-pressed="true">all <span>2</span></button>
+            <button type="button" data-tag="tag-cli" aria-pressed="false">cli <span>2</span></button>
+            <button type="button" data-tag="tag-config" aria-pressed="false">config <span>1</span></button>
+            <button type="button" data-tag="tag-macos" aria-pressed="false">macOS <span>1</span></button>
+            <button type="button" data-tag="tag-manpage" aria-pressed="false">manpage <span>2</span></button>
+            <button type="button" data-tag="tag-spotlight" aria-pressed="false">Spotlight <span>1</span></button>
+            <button type="button" data-tag="tag-zsh" aria-pressed="false">zsh <span>1</span></button>
+          </nav>
+    <div id="groups">
+            <section class="tag-group" id="tag-cli" data-group="tag-cli">
+        <h2>cli <span class="count">2</span></h2>
+        <ul class="docs">
+                    <li class="doc" data-search="mdls and Spotlight Metadata Attributes docs/mdls.md cli macOS manpage Spotlight">
+            <a href="export/mdls.html">mdls and Spotlight Metadata Attributes</a>
+            <span class="path">docs/mdls.md</span>
+          </li>
+                    <li class="doc" data-search="Zsh Options Reference docs/zshoptions.md cli config manpage zsh">
+            <a href="export/zshoptions.html">Zsh Options Reference</a>
+            <span class="path">docs/zshoptions.md</span>
+          </li>
+                  </ul>
+      </section>
+            <section class="tag-group" id="tag-config" data-group="tag-config">
+        <h2>config <span class="count">1</span></h2>
+        <ul class="docs">
+                    <li class="doc" data-search="Zsh Options Reference docs/zshoptions.md cli config manpage zsh">
+            <a href="export/zshoptions.html">Zsh Options Reference</a>
+            <span class="path">docs/zshoptions.md</span>
+          </li>
+                  </ul>
+      </section>
+            <section class="tag-group" id="tag-macos" data-group="tag-macos">
+        <h2>macOS <span class="count">1</span></h2>
+        <ul class="docs">
+                    <li class="doc" data-search="mdls and Spotlight Metadata Attributes docs/mdls.md cli macOS manpage Spotlight">
+            <a href="export/mdls.html">mdls and Spotlight Metadata Attributes</a>
+            <span class="path">docs/mdls.md</span>
+          </li>
+                  </ul>
+      </section>
+            <section class="tag-group" id="tag-manpage" data-group="tag-manpage">
+        <h2>manpage <span class="count">2</span></h2>
+        <ul class="docs">
+                    <li class="doc" data-search="mdls and Spotlight Metadata Attributes docs/mdls.md cli macOS manpage Spotlight">
+            <a href="export/mdls.html">mdls and Spotlight Metadata Attributes</a>
+            <span class="path">docs/mdls.md</span>
+          </li>
+                    <li class="doc" data-search="Zsh Options Reference docs/zshoptions.md cli config manpage zsh">
+            <a href="export/zshoptions.html">Zsh Options Reference</a>
+            <span class="path">docs/zshoptions.md</span>
+          </li>
+                  </ul>
+      </section>
+            <section class="tag-group" id="tag-spotlight" data-group="tag-spotlight">
+        <h2>Spotlight <span class="count">1</span></h2>
+        <ul class="docs">
+                    <li class="doc" data-search="mdls and Spotlight Metadata Attributes docs/mdls.md cli macOS manpage Spotlight">
+            <a href="export/mdls.html">mdls and Spotlight Metadata Attributes</a>
+            <span class="path">docs/mdls.md</span>
+          </li>
+                  </ul>
+      </section>
+            <section class="tag-group" id="tag-zsh" data-group="tag-zsh">
+        <h2>zsh <span class="count">1</span></h2>
+        <ul class="docs">
+                    <li class="doc" data-search="Zsh Options Reference docs/zshoptions.md cli config manpage zsh">
+            <a href="export/zshoptions.html">Zsh Options Reference</a>
+            <span class="path">docs/zshoptions.md</span>
+          </li>
+                  </ul>
+      </section>
+          </div>
+    <p class="empty" role="status">No matching documents.</p>
+  </main>
+  <script>
+    (function () {
+      var input = document.getElementById('filter');
+      var buttons = Array.from(document.querySelectorAll('[data-tag]'));
+      var groups = Array.from(document.querySelectorAll('.tag-group'));
+      var empty = document.querySelector('.empty');
+      var selected = '';
+
+      function applyFilter() {
+        var query = input.value.trim().toLocaleLowerCase();
+        var visibleDocuments = 0;
+        groups.forEach(function (group) {
+          var showGroup = !selected || group.dataset.group === selected;
+          var visibleInGroup = 0;
+          group.querySelectorAll('.doc').forEach(function (doc) {
+            var showDoc = showGroup && (!query || doc.dataset.search.toLocaleLowerCase().includes(query));
+            doc.hidden = !showDoc;
+            if (showDoc) visibleInGroup += 1;
+          });
+          group.hidden = !showGroup || visibleInGroup === 0;
+          visibleDocuments += visibleInGroup;
+        });
+        empty.style.display = visibleDocuments ? 'none' : 'block';
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          selected = button.dataset.tag;
+          buttons.forEach(function (item) { item.setAttribute('aria-pressed', String(item === button)); });
+          applyFilter();
+          if (selected) document.getElementById(selected).scrollIntoView({behavior:'smooth'});
+        });
+      });
+      input.addEventListener('input', applyFilter);
+    }());
+  </script>
+</body>
+</html>

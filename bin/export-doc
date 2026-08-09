@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Export one docs/*.md file to its matching export/*.html path.
+set -euo pipefail
+
+repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+
+if [[ $# -ne 1 || "$1" == "-h" || "$1" == "--help" ]]; then
+  echo "Usage: bin/export-doc docs/path/to/document.md" >&2
+  exit "$([[ $# -eq 1 ]] && [[ "$1" == "-h" || "$1" == "--help" ]] && echo 0 || echo 2)"
+fi
+
+input=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
+case "$input" in
+  "$repo_dir"/docs/*.md) ;;
+  *) echo "export-doc: input must be a .md file beneath $repo_dir/docs" >&2; exit 2 ;;
+esac
+
+relative=${input#"$repo_dir/docs/"}
+output="$repo_dir/export/${relative%.md}.html"
+title=$("$repo_dir/bin/catalog" title "$input")
+mkdir -p "$(dirname "$output")"
+root_prefix=$(python3 -c 'import os, sys; print(os.path.relpath(sys.argv[1], sys.argv[2]) + "/")' "$repo_dir" "$(dirname "$output")")
+
+pandoc "$input" \
+  --from=markdown \
+  --template="$repo_dir/templates/claude-docs.html" \
+  --lua-filter="$repo_dir/bin/rewrite-md-links.lua" \
+  --syntax-highlighting=breezedark \
+  --metadata "title=$title" \
+  --metadata "root_prefix=$root_prefix" \
+  --standalone \
+  --toc \
+  --toc-depth=3 \
+  --wrap=none \
+  --output="$output"
+
+perl -pi -e 's/[ \t]+$//' "$output"
+
+printf '%s\n' "$output"

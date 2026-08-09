@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Rebuild every docs/*.md export and the static tag catalog.
+set -euo pipefail
+
+repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+catalog_json=$(mktemp -t reference-catalog.XXXXXX)
+trap 'rm -f "$catalog_json"' EXIT
+
+"$repo_dir/bin/catalog" validate
+"$repo_dir/bin/catalog" catalog > "$catalog_json"
+
+# HTML beneath export/ is generated output. Remove it first so deleted or
+# renamed Markdown sources cannot leave stale pages behind.
+mkdir -p "$repo_dir/export"
+find "$repo_dir/export" -type f -name '*.html' -delete
+
+while IFS= read -r -d '' source; do
+  "$repo_dir/bin/export-doc" "$source"
+done < <(find "$repo_dir/docs" -type f -name '*.md' -print0 | sort -z)
+
+pandoc "$repo_dir/index.md" \
+  --from=markdown \
+  --standalone \
+  --wrap=none \
+  --output="$repo_dir/index.html"
+
+pandoc "$repo_dir/tagged.md" \
+  --from=markdown \
+  --metadata-file="$catalog_json" \
+  --template="$repo_dir/templates/tagged.html" \
+  --standalone \
+  --wrap=none \
+  --output="$repo_dir/tagged.html"
+
+perl -pi -e 's/[ \t]+$//' "$repo_dir/index.html" "$repo_dir/tagged.html"
+
+printf 'rebuilt %s, %s, and %s\n' "$repo_dir/export" "$repo_dir/index.html" "$repo_dir/tagged.html"

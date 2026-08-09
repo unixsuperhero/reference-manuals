@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+"""Read reference-manual front matter and emit deterministic catalog data."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+
+
+def scalar(value: str) -> str:
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        return value[1:-1]
+    return value
+
+
+def metadata(path: Path) -> dict[str, object]:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    result: dict[str, object] = {}
+    if not lines or lines[0].strip() != "---":
+        return result
+
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() in {"---", "..."}), None)
+    if end is None:
+        raise ValueError(f"{path}: unclosed YAML front matter")
+
+    current_list: str | None = None
+    for raw in lines[1:end]:
+        list_item = re.match(r"^\s+-\s+(.+?)\s*$", raw)
+        if list_item and current_list:
+            values = result.setdefault(current_list, [])
+            assert isinstance(values, list)
+            values.append(scalar(list_item.group(1)))
+            continue
+
+        field = re.match(r"^([A-Za-z][\w-]*):\s*(.*?)\s*$", raw)
+        if not field:
+            current_list = None
+            continue
+        key, value = field.groups()
+        current_list = key if not value else None
+        if not value:
+            result[key] = []
+        elif value.startswith("[") and value.endswith("]"):
+            result[key] = [scalar(item) for item in value[1:-1].split(",") if item.strip()]
+        else:
+            result[key] = scalar(value)
+    return result
+
+
+def title_for(path: Path, meta: dict[str, object]) -> str:
+    if isinstance(meta.get("title"), str) and meta["title"]:
+        return str(meta["title"])
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()
+    return path.stem.replace("-", " ").replace("_", " ").title()
+
+
+def slug(value: str) -> str:
+    clean = re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-") or "tag"
+    return "tag-" + clean
+
+
+def document_record(repo: Path, path: Path) -> dict[str, object]:
+    meta = metadata(path)
+    raw_tags = meta.get("tags", [])
+    if isinstance(raw_tags, str):
+        raw_tags = [raw_tags]
+    tags = sorted({str(tag).strip() for tag in raw_tags if str(tag).strip()}, key=str.casefold)
+    relative = path.relative_to(repo / "docs")
+    return {
+        "title": title_for(path, meta),
+        "source": (Path("docs") / relative).as_posix(),
+        "href": (Path("export") / relative.with_suffix(".html")).as_posix(),
+        "tags": tags,
+        "tags_text": " ".join(tags),
+    }
+
+
+def build_catalog(repo: Path) -> dict[str, object]:
+    paths = sorted((repo / "docs").rglob("*.md"), key=lambda path: path.as_posix().casefold())
+    documents = [document_record(repo, path) for path in paths]
+    tag_names = sorted({tag for doc in documents for tag in doc["tags"]}, key=str.casefold)
+    used_slugs: set[str] = set()
+    groups = []
+    for name in tag_names:
+        base = slug(name)
+        group_slug = base
+        suffix = 2
+        while group_slug in used_slugs:
+            group_slug = f"{base}-{suffix}"
+            suffix += 1
+        used_slugs.add(group_slug)
+        members = [doc for doc in documents if name in doc["tags"]]
+        groups.append({"name": name, "slug": group_slug, "count": len(members), "documents": members})
+    return {
+        "document_count": len(documents),
+        "tag_count": len(groups),
+        "documents": documents,
+        "tag_groups": groups,
+    }
+
+
+def validate_index(repo: Path, data: dict[str, object]) -> list[str]:
+    index_path = repo / "index.md"
+    if not index_path.is_file():
+        return ["index.md is missing"]
+    linked = {
+        Path(match).as_posix().lstrip("./")
+        for match in re.findall(r"\]\((?:\./)?(docs/[^)#?]+\.md)(?:[)#?])", index_path.read_text(encoding="utf-8"))
+    }
+    expected = {str(doc["source"]) for doc in data["documents"]}
+    messages = [f"index.md is missing {source}" for source in sorted(expected - linked)]
+    messages.extend(f"index.md links unknown document {source}" for source in sorted(linked - expected))
+    return messages
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", choices=("catalog", "title", "validate"))
+    parser.add_argument("path", nargs="?", type=Path)
+    args = parser.parse_args()
+    repo = Path(__file__).resolve().parent.parent
+
+    try:
+        if args.command == "title":
+            if args.path is None:
+                parser.error("title requires a Markdown path")
+            path = args.path.resolve()
+            print(title_for(path, metadata(path)))
+            return 0
+
+        data = build_catalog(repo)
+        if args.command == "catalog":
+            json.dump(data, sys.stdout, ensure_ascii=False, indent=2, sort_keys=True)
+            print()
+            return 0
+
+        errors = [f"{doc['source']} has no tags" for doc in data["documents"] if not doc["tags"]]
+        errors.extend(validate_index(repo, data))
+        if errors:
+            for message in errors:
+                print(f"catalog: {message}", file=sys.stderr)
+            return 1
+        print(f"catalog: {data['document_count']} document(s), {data['tag_count']} tag(s)")
+        return 0
+    except (OSError, ValueError) as error:
+        print(f"catalog: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
