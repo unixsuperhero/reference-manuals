@@ -7,9 +7,11 @@ tags:
   - config
 ---
 
-A concise, example-driven explanation of every zsh option, in the same groups and order as the `zshoptions(1)` man page (zsh 5.9). Each entry lists what the option does, a short example, and a scenario where it's useful.
+A concise, example-driven explanation of every zsh option, in the same groups and order as the `zshoptions(1)` man page (zsh 5.9). Each entry lists what the option does, a short example, and a scenario where it's useful. The appendix reproduces the referenced sections from related man pages (filename generation, prompt escapes, history expansion, MULTIOS) so this document is self-contained.
 
 **How to read the markers:** `<D>` = on by default in all emulations; `<C>` `<K>` `<S>` `<Z>` = on by default only in csh, ksh, sh, or zsh emulation respectively. A `(-x)` after a name is the single-letter form. Set with `setopt NAME`, clear with `unsetopt NAME` (or `setopt NO_NAME`). Option names are case-insensitive and ignore underscores, so `allexport`, `ALL_EXPORT`, and `A__lleXP_ort` are all the same.
+
+**Appendix contents:** [A. Specifying Options](#a-specifying-options) · [B. Option Aliases](#b-option-aliases) · [C. Single Letter Options](#c-single-letter-options) · [D. Related Manual Pages](#d-related-manual-pages) · [E. Filename Generation (Globbing)](#e-filename-generation-globbing--from-zshexpn1) · [F. Prompt Expansion & Escapes](#f-prompt-expansion--escapes--from-zshmisc1) · [G. History Expansion](#g-history-expansion--from-zshexpn1) · [H. MULTIOS & Commandless Redirections](#h-multios--commandless-redirections--from-zshmisc1)
 
 ---
 
@@ -379,7 +381,7 @@ setopt BARE_GLOB_QUAL
 ls *(.)      # (.) is a qualifier: matches plain files only
 ls *(/)      # (/) matches directories only
 ```
-- **When it's useful:** Selecting files by type or attribute (directories, symlinks, executables) directly in a glob.
+- **When it's useful:** Selecting files by type or attribute (directories, symlinks, executables) directly in a glob. See [Appendix E](#e-filename-generation-globbing--from-zshexpn1) for the full qualifier list.
 
 ### BRACE_CCL
 
@@ -455,7 +457,7 @@ setopt EXTENDED_GLOB
 ls ^*.o      # all files NOT ending in .o
 ls *.c~foo.c # all .c files except foo.c
 ```
-- **When it's useful:** Powerful negation and exclusion patterns, like listing everything except certain files.
+- **When it's useful:** Powerful negation and exclusion patterns, like listing everything except certain files. See [Appendix E](#e-filename-generation-globbing--from-zshexpn1) for the operators this unlocks.
 
 ### FORCE_FLOAT
 
@@ -531,7 +533,7 @@ setopt HIST_SUBST_PATTERN
 foo=file123
 echo ${foo:s/[0-9]##/NUM/}   # -> fileNUM  (pattern-based substitution)
 ```
-- **When it's useful:** Doing pattern-based (rather than literal) substitutions in history and parameter modifiers.
+- **When it's useful:** Doing pattern-based (rather than literal) substitutions in history and parameter modifiers. See [Appendix G](#g-history-expansion--from-zshexpn1) for the modifier syntax.
 
 ### IGNORE_BRACES (`-I`) `<S>`
 
@@ -563,7 +565,7 @@ setopt KSH_GLOB
 ls !(*.o)    # ksh-style: everything except .o files
 ls @(foo|bar).c   # foo.c or bar.c
 ```
-- **When it's useful:** Running or porting ksh-style pattern syntax in zsh.
+- **When it's useful:** Running or porting ksh-style pattern syntax in zsh. See [Appendix E → ksh-like Glob Operators](#e-filename-generation-globbing--from-zshexpn1).
 
 ### MAGIC_EQUAL_SUBST
 
@@ -719,7 +721,7 @@ ls /tmp
 !!        # re-runs the previous command: ls /tmp
 echo !$   # expands to the last argument of the previous line
 ```
-- **When it's useful:** When you want quick shorthand like `!!` or `!$` to reuse previous commands and arguments.
+- **When it's useful:** When you want quick shorthand like `!!` or `!$` to reuse previous commands and arguments. See [Appendix G](#g-history-expansion--from-zshexpn1) for the full designator and modifier reference.
 
 ### EXTENDED_HISTORY `<C>`
 
@@ -1331,7 +1333,7 @@ setopt POSIX_JOBS
 
 ### PROMPT_BANG `<K>`
 
-- **What it does:** When set, `!` is treated specially in prompt expansion (see EXPANSION OF PROMPT SEQUENCES in zshmisc(1)).
+- **What it does:** When set, `!` is treated specially in prompt expansion (see [Appendix F](#f-prompt-expansion--escapes--from-zshmisc1)).
 - **Example:**
 ```zsh
 setopt PROMPT_BANG
@@ -1365,7 +1367,7 @@ export PROMPT_EOL_MARK='%B%S<EOL>%s%b'   # customize the end-of-line marker
 
 ### PROMPT_PERCENT `<C>` `<Z>`
 
-- **What it does:** When set, `%` is treated specially in prompt expansion (see EXPANSION OF PROMPT SEQUENCES in zshmisc(1)).
+- **What it does:** When set, `%` is treated specially in prompt expansion (see [Appendix F](#f-prompt-expansion--escapes--from-zshmisc1)).
 - **Example:**
 ```zsh
 setopt PROMPT_PERCENT
@@ -1569,7 +1571,7 @@ setopt MULTIOS
 echo hi > a.txt > b.txt   # implicit tee: writes to both files
 cat < a.txt < b.txt       # implicit cat: reads both
 ```
-- **When it's useful:** When you want to send one command's output to several files, or feed several files into one command, without an explicit `tee`/`cat`.
+- **When it's useful:** When you want to send one command's output to several files, or feed several files into one command, without an explicit `tee`/`cat`. See [Appendix H](#h-multios--commandless-redirections--from-zshmisc1) for the full behaviour and caveats.
 
 ### OCTAL_ZEROES `<S>`
 
@@ -1734,7 +1736,7 @@ line2"          # newline must be preceded by a backslash, else error
 setopt CSH_NULLCMD
 > file.txt   # fails: no command given (NULLCMD not consulted)
 ```
-- **When it's useful:** When you want commandless redirections to be treated as errors, csh-style.
+- **When it's useful:** When you want commandless redirections to be treated as errors, csh-style. See [Appendix H](#h-multios--commandless-redirections--from-zshmisc1).
 
 ### KSH_ARRAYS `<K>` `<S>`
 
@@ -1875,7 +1877,7 @@ echo ~$USERNAME   # ~ expanded before $USERNAME, so this may not resolve the use
 setopt SH_NULLCMD
 > file.txt   # behaves as ': > file.txt' (truncates/creates the file)
 ```
-- **When it's useful:** When you want commandless redirections to default to `:` like POSIX sh, rather than zsh's NULLCMD.
+- **When it's useful:** When you want commandless redirections to default to `:` like POSIX sh, rather than zsh's NULLCMD. See [Appendix H](#h-multios--commandless-redirections--from-zshmisc1).
 
 ### SH_OPTION_LETTERS `<K>` `<S>`
 
@@ -2141,10 +2143,360 @@ These single-letter flags are used for purposes other than setting shell options
 
 ## D. Related Manual Pages
 
-- **zshoptions(1)** — the source for this document (zsh 5.9, dated May 14 2022).
+- **zshoptions(1)** — the source for the option descriptions above (zsh 5.9, dated May 14 2022).
 - **zshbuiltins(1)** — details of the `cd`, `setopt`, `unsetopt`, `set`, `typeset`, `disable`, and other builtins referenced above.
-- **zshmisc(1)** — "EXPANSION OF PROMPT SEQUENCES" (referenced by `PROMPT_BANG` and `PROMPT_PERCENT`), redirection, and job-control semantics.
-- **zshexpn(1)** — filename expansion, filename generation (globbing), glob qualifiers, and history expansion referenced throughout Expansion and Globbing and History.
+- **zshmisc(1)** — prompt sequence expansion (Appendix F), MULTIOS and commandless redirection (Appendix H), plus redirection and job-control semantics.
+- **zshexpn(1)** — filename generation / globbing (Appendix E) and history expansion (Appendix G), plus filename and parameter expansion.
 - **zshparam(1)** — parameters such as `CORRECT_IGNORE`, `CORRECT_IGNORE_FILE`, `KEYBOARD_HACK`, `PROMPT_EOL_MARK`, `HISTFILE`, `HISTSIZE`, and `SAVEHIST`.
 - **zshzle(1)** — the Zsh Line Editor, `bindkey`, and widget behaviour referenced by the Zle and Completion groups.
 - **zshcompsys(1)** / **zshcompwid(1)** — the completion system underlying the Completion group.
+
+The remaining appendices reproduce the most-referenced of these sections so this document stands on its own.
+
+## E. Filename Generation (Globbing) — from zshexpn(1)
+
+If a word contains an unquoted instance of one of the characters `*`, `(`, `|`, `<`, `[`, or `?`, it is regarded as a pattern for filename generation, unless the `GLOB` option is unset. If the `EXTENDED_GLOB` option is set, the `^` and `#` characters also denote a pattern; otherwise they are not treated specially by the shell.
+
+The word is replaced with a list of sorted filenames that match the pattern. If no matching pattern is found, the shell gives an error message, unless the `NULL_GLOB` option is set, in which case the word is deleted; or unless the `NOMATCH` option is unset, in which case the word is left unchanged.
+
+In filename generation, the character `/` must be matched explicitly; also, a `.` must be matched explicitly at the beginning of a pattern or after a `/`, unless the `GLOB_DOTS` option is set. No filename generation pattern matches the files `.` or `..`. In other instances of pattern matching, the `/` and `.` are not treated specially.
+
+### Glob Operators
+
+| Operator | Meaning |
+| --- | --- |
+| `*` | Matches any string, including the null string. |
+| `?` | Matches any character. |
+| `[...]` | Matches any of the enclosed characters. Ranges are given as `a-z`. A `-` or `]` may be matched by placing it first. Named classes `[:name:]` are also allowed (see below). |
+| `[^...]`, `[!...]` | Like `[...]`, but matches any character **not** in the set. |
+| `<x-y>` | Matches any number in the range `x` to `y`, inclusive. Either bound may be omitted; `<->` matches any number. |
+| `(...)` | Matches the enclosed pattern; used for grouping. |
+| `x\|y` | Matches either `x` or `y`. Lowest precedence; the `\|` must be within parentheses to avoid being read as a pipeline. |
+| `^x` | (`EXTENDED_GLOB`) Matches anything except the pattern `x`. |
+| `x~y` | (`EXTENDED_GLOB`) Matches anything matching `x` but not `y`. In `y`, `/` and `.` are not special. |
+| `x#` | (`EXTENDED_GLOB`) Matches zero or more occurrences of `x`. |
+| `x##` | (`EXTENDED_GLOB`) Matches one or more occurrences of `x`. |
+
+**Named character classes** usable inside `[...]` (note the double brackets, e.g. `[[:alnum:]]`). Locale-sensitive set: `[:alnum:]`, `[:alpha:]`, `[:ascii:]`, `[:blank:]`, `[:cntrl:]`, `[:digit:]`, `[:graph:]`, `[:lower:]`, `[:print:]`, `[:punct:]`, `[:space:]`, `[:upper:]`, `[:xdigit:]`. Shell-internal set: `[:IDENT:]` (valid in a shell identifier), `[:IFS:]` (a character in `$IFS`), `[:IFSSPACE:]` (IFS whitespace), `[:INCOMPLETE:]` (starts an incomplete multibyte char), `[:INVALID:]` (does not start a valid multibyte char), `[:WORD:]` (part of a word per `$WORDCHARS`).
+
+Precautions and precedence: with numeric ranges, `<0-9>*` matches any number at the start of the string (longest-match rule); use `<0-9>[^[:digit:]]*` instead. Grouping cannot span `/`, except that `(pat/)#` as a complete path segment matches a sequence of directories, e.g. `foo/(a*/)#bar` matches `foo/bar`, `foo/any/bar`, etc. Operator precedence is (highest) `^`, `/`, `~`, `|` (lowest); `#`/`##` bind to the shortest preceding unit, so `12#` = `1(2#)`.
+
+### ksh-like Glob Operators
+
+If `KSH_GLOB` is set, a `@`, `*`, `+`, `?` or `!` immediately before a `(` modifies the group:
+
+| Operator | Meaning |
+| --- | --- |
+| `@(...)` | Match the pattern once. (Like `(...)`.) |
+| `*(...)` | Match any number of occurrences. (Like `(...)#`, no recursive directory search.) |
+| `+(...)` | Match at least one occurrence. (Like `(...)##`, no recursive directory search.) |
+| `?(...)` | Match zero or one occurrence. (Like `(\|...)`.) |
+| `!(...)` | Match anything but the expression. (Like `(^(...))`.) |
+
+### Globbing Flags
+
+Flags of the form `(#X)` affect text to their right up to the end of the enclosing group/pattern; they require `EXTENDED_GLOB`:
+
+| Flag | Meaning |
+| --- | --- |
+| `i` | Case insensitive. |
+| `l` | Lowercase in pattern matches upper or lower; uppercase still matches only uppercase. |
+| `I` | Case sensitive: locally negates `i`/`l`. |
+| `b` | Activate backreferences: matched groups go into `$match`, start indices into `$mbegin`, end indices into `$mend` (only the first nine active parens; not in filename generation). |
+| `B` | Deactivate backreferences. |
+| `cN,M` | Require between `N` and `M` matches of the preceding unit (like `{N,M}`). Forms: `(#cN)` exactly N, `(#c,M)`, `(#cN,)`. |
+| `m` | Set `$MATCH`/`$MBEGIN`/`$MEND` to the whole matched string and its indices (must be in effect at pattern end; not in filename generation). |
+| `M` | Deactivate the `m` flag. |
+| `anum` | Approximate matching allowing `num` errors (see below). |
+| `s`, `e` | `(#s)` matches only at the start of the test string, `(#e)` only at the end (like `^` and `$`). Each must appear alone. |
+| `q` | Ignore the flag and everything up to the closing paren — lets glob qualifiers coexist with pattern matching, e.g. `(#b)(*).c(#q.)`. |
+| `u` | Respect the locale for multibyte characters (overrides `MULTIBYTE`). |
+| `U` | Treat all characters as single bytes (overrides `MULTIBYTE`). |
+
+Example: `(#i)FOOXX` matches `fooxx`; `(#ia2)readme` matches `readme` case-insensitively with up to two errors.
+
+```zsh
+foo="a_string_with_a_message"
+if [[ $foo = (a|an)_(#b)(*) ]]; then
+  print ${foo[$mbegin[1],$mend[1]]}   # prints: string_with_a_message
+fi
+
+arr=(veldt jynx grimps waqf zho buck)
+print ${arr//(#m)[aeiou]/${(U)MATCH}}  # uppercases every vowel
+```
+
+### Approximate Matching
+
+With `(#anum)`, up to `num` errors are tolerated. Four error types are recognised: (1) different characters (`fooxbar` vs `fooybar`); (2) transposition (`banana` vs `abnana`); (3) a missing character in the target (`road` vs `rod`); (4) an extra character in the target (`stove` vs `strove`). Non-literal parts, initial dots, and all slashes must match exactly. The maximum errors may be varied locally via grouping, e.g. `(#a1)cat((#a0)dog)fox` allows one error but not in `dog`. Place `(#a1)` after path segments known to be correct, since every directory must otherwise be scanned for approximate matches.
+
+### Recursive Globbing
+
+`(foo/)#` matches zero or more directories matching `foo`. As shorthand, `**/` is equivalent to `(*/)#` (so it also matches the current directory):
+
+```zsh
+ls -ld -- **/bar       # recursive search for files named bar
+ls -ld -- ***/bar      # same, but follows symbolic links
+```
+
+Neither `**/` nor `***/` combines with other globbing in the same path segment. With `GLOB_STAR_SHORT` set, `**` and `***` not immediately followed by `/` imply an extra `/*`, so `**.c` == `**/*.c`.
+
+### Glob Qualifiers
+
+Patterns may end in a parenthesised list of qualifiers that filters which matches are kept. With `BARE_GLOB_QUAL`, a trailing `(...)` with no `|`/`(`/special-`~` is taken as qualifiers; force a literal group by doubling, e.g. `((^x))`. With `EXTENDED_GLOB`, the form `(#qx)` is also available and multiple `(#q...)` groups may be chained (logical AND).
+
+**File-type qualifiers:**
+
+| Qualifier | Selects |
+| --- | --- |
+| `/` | directories |
+| `F` | full (non-empty) directories (use `(/^F)` for empty directories) |
+| `.` | plain files |
+| `@` | symbolic links |
+| `=` | sockets |
+| `p` | named pipes (FIFOs) |
+| `*` | executable plain files |
+| `%`, `%b`, `%c` | device files; block special; character special |
+
+**Permission qualifiers:** `r`/`w`/`x` (owner read/write/execute), `A`/`I`/`E` (group), `R`/`W`/`X` (world), `s`/`S`/`t` (setuid/setgid/sticky), `U`/`G` (owned by effective uid/gid). `fspec` matches explicit mode bits, e.g. `*(f70?)`, `*(f-100)`, `*(f:gu+w,o-rx:)`.
+
+**Other qualifiers:**
+
+| Qualifier | Meaning |
+| --- | --- |
+| `estring` / `+cmd` | Include the file only if the shell code returns zero status. `$REPLY` holds the filename and may be rewritten; `reply` may set an array. E.g. `ls -ld -- *(+nt)` with a helper function `nt`. |
+| `ddev` | files on device `dev` |
+| `l[-\|+]ct` | link count less than / greater than / equal to `ct` |
+| `uid` / `gid` | owned by user/group id or name, e.g. `u:foo:` |
+| `a[Mwhms][-\|+]n` | accessed n units ago (`-` within, `+` more than); unit `M`onths/`w`eeks/`h`ours/`m`inutes/`s`econds/days |
+| `m...` | like `a` but modification time |
+| `c...` | like `a` but inode change time |
+| `L[+\|-]n` | size less/more/exactly n bytes; suffix `k`/`m`/`p` (also `g`/`t` on some systems) for KB/MB/512-byte-blocks |
+| `^` | negate following qualifiers |
+| `-` | toggle qualifiers between symlinks and their targets |
+| `M`, `T`, `N`, `D`, `n` | apply `MARK_DIRS`, `LIST_TYPES`, `NULL_GLOB`, `GLOB_DOTS`, `NUMERIC_GLOB_SORT` for this pattern |
+| `Yn` | short-circuit: expand to at most `n` filenames |
+| `oc` / `Oc` | sort ascending/descending by `c`: `n`ame, `L`ength, `l`inks, `a`ccess, `m`odification, `c`hange time, `d`irectories, `N`o-sort, or `e`/`+` shell code |
+| `[beg,end]` | array-subscript selection of matches, e.g. `*(-OL[1,3])` = three largest files |
+| `Pstr` | prepend `str` as a separate word before each match (append if `^` active) |
+
+Sublists separated by commas are OR'ed (qualifiers within a sublist are AND'ed). A `:` introduces history-style modifiers (see Appendix G), each preceded by its own `:`.
+
+```zsh
+ls -ld -- *(-/)          # dirs and symlinks pointing to dirs
+ls -ld -- *(-@)          # broken symlinks
+ls -ld -- *(W,X)         # world-writable or world-executable files
+print -rC1 /tmp/foo*(u0^@:t)   # basenames of root-owned foo* files, ignoring symlinks
+ls -ld -- *.*~(lex|parse).[ch](^D^l1)  # link-count-1 dotted-name files except lex/parse .c/.h
+```
+
+## F. Prompt Expansion & Escapes — from zshmisc(1)
+
+Prompt sequences undergo a special form of expansion, also available via `print -P`. If `PROMPT_SUBST` is set, the prompt is first subjected to parameter expansion, command substitution and arithmetic expansion. If `PROMPT_BANG` is set, a `!` is replaced by the current history event number (`!!` for a literal `!`). If `PROMPT_PERCENT` is set, `%` escape sequences are expanded; many take an optional integer between the `%` and the sequence character.
+
+### Special Characters
+
+| Escape | Meaning |
+| --- | --- |
+| `%%` | A literal `%`. |
+| `%)` | A literal `)`. |
+
+### Login Information
+
+| Escape | Meaning |
+| --- | --- |
+| `%l` | The line (tty) logged in on, `/dev/` and `/dev/tty` prefixes stripped. |
+| `%M` | The full machine hostname. |
+| `%m` | Hostname up to the first `.`. An integer selects that many components; negative shows trailing ones. |
+| `%n` | `$USERNAME`. |
+| `%y` | The line (tty), `/dev/` stripped but `/dev/tty` **not** treated specially. |
+
+### Shell State
+
+| Escape | Meaning |
+| --- | --- |
+| `%#` | `#` if the shell is privileged, else `%`. Equivalent to `%(!.#.%%)`. |
+| `%?` | Return status of the last command before the prompt. |
+| `%_` | Parser state (started constructs like `if`/`for`); an integer prints that many. Useful in `PS2`/`PS4`. |
+| `%^` | Parser state in reverse; often used in `RPS2`. |
+| `%d`, `%/` | Current working directory. An integer shows that many trailing components (0 = whole path); negative = leading. |
+| `%~` | As `%d`/`%/` but contract `$HOME` (or a named directory prefix) to `~`. |
+| `%e` | Evaluation depth of the current sourced file/function/eval; useful in `$PS4`. |
+| `%h`, `%!` | Current history event number. |
+| `%i` | Line number being executed in the script/file/function of `%N`; useful in `$PS4`. |
+| `%I` | Like `%i` but always the line number in the file `%x`. |
+| `%j` | The number of jobs. |
+| `%L` | The current value of `$SHLVL`. |
+| `%N` | Name of the script/sourced file/function most recently started (else `$0`). Integer = trailing path components; negative = leading. |
+| `%x` | Name of the file containing the source being executed (functions/evals show their defining file). |
+| `%c`, `%.`, `%C` | Trailing component(s) of the cwd (`%c`/`%1~`, `%C`/`%1/`); deprecated. |
+
+### Date and Time
+
+| Escape | Meaning |
+| --- | --- |
+| `%D` | Date as yy-mm-dd. |
+| `%T` | Time of day, 24-hour. |
+| `%t`, `%@` | Time of day, 12-hour am/pm. |
+| `%*` | Time of day, 24-hour with seconds. |
+| `%w` | Date as day-dd. |
+| `%W` | Date as mm/dd/yy. |
+| `%D{string}` | `string` formatted with `strftime(3)`; zsh extensions `%f`/`%K`/`%L` give no-leading-zero day/24h/12h, and `%[digits].` gives sub-second decimals (`%6.` microseconds, `%9.`/`%N` nanoseconds). A `-` after `%` strips leading zero/space for `d f H k l m M S y`. |
+
+### Visual Effects
+
+| Escape | Meaning |
+| --- | --- |
+| `%B` (`%b`) | Start (stop) boldface. |
+| `%E` | Clear to end of line. |
+| `%U` (`%u`) | Start (stop) underline. |
+| `%S` (`%s`) | Start (stop) standout. |
+| `%F` (`%f`) | Start (stop) foreground colour, e.g. `%F{red}` or numeric. |
+| `%K` (`%k`) | Start (stop) background colour; same syntax as `%F`. |
+| `%{...%}` | Include a literal escape sequence that does not move the cursor. |
+| `%G` | Within `%{...%}`, count as one character width (integer for other widths). |
+
+### Conditional Substrings
+
+`%v` is the first element of `$psvar` (integer selects an element; negative counts from the end).
+
+**Ternary:** `%(x.true-text.false-text)` — the character after `x` separates the branches; a `)` in false-text is written `%)`. A positive integer `n` before/after `(` sets the comparison value. Test characters `x`:
+
+| Test | True if… |
+| --- | --- |
+| `!` | the shell is privileged |
+| `#` | the effective uid is `n` |
+| `?` | the last exit status was `n` |
+| `_` | at least `n` shell constructs are started |
+| `C`/`/`, `c`/`.`/`~` | the (absolute / prefix-replaced) path has at least `n` elements |
+| `D`, `d` | month equals `n` (Jan=0); day of month equals `n` |
+| `e`, `g`, `j`, `L`, `S` | eval depth / effective gid / job count / `$SHLVL` / `$SECONDS` at least `n` |
+| `l` | at least `n` characters already printed on the line (negative = before the opposite margin) |
+| `T`, `t` | time in hours / minutes equals `n` |
+| `v`, `V` | `$psvar` has at least `n` elements / element `n` is set and non-empty |
+| `w` | day of week equals `n` (Sun=0) |
+
+**Truncation:** `%<string<`, `%>string>` (and deprecated `%[xstringx]`) truncate the rest of the prompt to the numeric length, replacing the cut part with `string`. `<` truncates the left, `>` the right; a negative length leaves that many characters before the margin. A zero-argument form like `%<<` ends the truncation range, e.g. `%10<...<%~%<<%# `.
+
+## G. History Expansion — from zshexpn(1)
+
+History expansion lets you reuse words from previous command lines. Each command is saved as a numbered *history event* (size controlled by `HISTSIZE`); the number in your prompt (`%h`) is the one to be assigned next.
+
+### Overview
+
+A history expansion begins with the first character of `$histchars` (default `!`) and may appear anywhere on the line, including inside double quotes — but not inside `'...'` or `$'...'`, nor when escaped with a backslash. The `!` is followed by an optional *event designator* and an optional *word designator*; if neither is present, no expansion occurs. Expanded lines are echoed before execution, and it is the expanded form that is recorded. History expansions do not nest.
+
+By default a reference with no event designator refers to the same event as any preceding reference on the line, or to the previous command if it is the only one. With `CSH_JUNKIE_HISTORY` set, every bare reference refers to the previous command. The sequence `^old^new` (where `^` is the second `$histchars` character) repeats the last command replacing `old` with `new`; it is short for `!!:s^old^new^`, so further modifiers may follow (e.g. `^old^new^:G` for global). The sequence `!"` temporarily disables the history mechanism for the rest of the current list.
+
+### Event Designators
+
+| Designator | Refers to |
+| --- | --- |
+| `!` | Start a history expansion, except when followed by a blank, newline, `=` or `(`. |
+| `!!` | The previous command. |
+| `!n` | Command-line `n`. |
+| `!-n` | The current command minus `n`. |
+| `!str` | The most recent command starting with `str`. |
+| `!?str[?]` | The most recent command containing `str` (trailing `?` needed before following text/modifiers). |
+| `!#` | The current command line typed so far. |
+| `!{...}` | Insulate a reference from adjacent characters. |
+
+### Word Designators
+
+A `:` usually separates the event from the word designator; it may be omitted if the word designator begins with `^`, `$`, `*`, `-` or `%`.
+
+| Designator | Selects |
+| --- | --- |
+| `0` | The first input word (command). |
+| `n` | The nth argument. |
+| `^` | The first argument (i.e. `1`). |
+| `$` | The last argument. |
+| `%` | The word matched by the most recent `?str` search (only valid in `!%`, `!:%` or `!?str?:%` after a `!?` search). |
+| `x-y` | A range of words; `x` defaults to `0`. |
+| `*` | All the arguments, or nothing if there are none. |
+| `x*` | Abbreviates `x-$`. |
+| `x-` | Like `x*` but omitting the last word. |
+
+### Modifiers
+
+After the word designator you may add a sequence of modifiers, each preceded by `:`. These also work on the results of filename generation and parameter expansion (except where noted).
+
+| Modifier | Effect |
+| --- | --- |
+| `a` | Turn a filename into an absolute path (logical: resolves `.` and `..` textually, not via the filesystem). |
+| `A` | Like `a`, then resolve symbolic links via `realpath(3)`. |
+| `c` | Resolve a command name to a full path via `$PATH`. |
+| `e` | Leave only the filename extension after the `.`. |
+| `h` `[digits]` | Remove a trailing path component (`dirname`); with digits, keep that many leading components. |
+| `l` | Convert to lowercase. |
+| `p` | Print the new command but do not execute it (history expansion only). |
+| `P` | Turn a filename into an absolute, symlink-free path like `realpath(3)`, but preserving non-existent trailing components. |
+| `q` | Quote the words, escaping further substitution. |
+| `Q` | Remove one level of quotes. |
+| `r` | Remove a filename extension, leaving the root name. |
+| `s/l/r[/]` | Substitute `r` for the first match of `l`; `gs/l/r` or `s/l/r/:G` substitutes globally. |
+| `&` | Repeat the previous `s` substitution (may be preceded by `g`). |
+| `t` `[digits]` | Remove leading path components, leaving the tail (`basename`); with digits keep that many trailing components. |
+| `u` | Convert to uppercase. |
+| `x` | Like `q`, but break into words at whitespace (not for parameter expansion). |
+| `f` | Repeat the immediately following modifier until the word stops changing (parameter expansion / filename generation). |
+| `F:expr:` | Like `f` but at most `expr` times. |
+| `w` | Apply the immediately following modifier to each word of the string. |
+| `W:sep:` | Like `w` but with `sep` as the word separator. |
+
+**Substitution details:** any character can be the delimiter in `s/l/r/` (a backslash quotes it). In `r`, `&` is replaced by the matched `l` text (quote with `\`). A null `l` reuses the previous `l` or the `?str` scan string. The rightmost delimiter may be omitted if a newline follows. With `HIST_SUBST_PATTERN` set, `l` is a pattern (as in Appendix E): `#` anchors the match to the start and `%` to the end.
+
+```zsh
+ls /a/b/c
+!!:h        # -> ls /a/b   (drop last path component)
+!ls:s/c/d/  # re-run most recent ls, replacing c with d
+```
+
+## H. MULTIOS & Commandless Redirections — from zshmisc(1)
+
+### MULTIOS
+
+If the `MULTIOS` option is set (the default) and a file descriptor is opened for writing more than once, the shell attaches it to a process that copies its input to all the outputs, like `tee`:
+
+```zsh
+date >foo >bar     # writes the date to both foo and bar
+date >foo | cat    # a pipe is an implicit redirection: writes foo AND pipes to cat
+```
+
+All target files are opened immediately, not when about to be written, and redirections are always evaluated in order. That ordering interacts with MULTIOS: `date >&1 >output` duplicates the original stdout (tee-like), whereas `date >output >&1` sends a second copy into `output` because `>&1` is evaluated after stdout was already redirected there.
+
+With MULTIOS set, the word after a redirection also undergoes filename generation:
+
+```zsh
+: > *              # truncate all files in the directory (not create a file named *)
+echo exit 0 >> *.sh
+```
+
+Opening a descriptor for reading more than once turns it into a process that concatenates all the inputs in order (each opened immediately, unlike `cat`):
+
+```zsh
+sort <foo <fubar   # equivalent to: cat foo fubar | sort
+sort <f{oo,ubar}   # same thing
+cat bar | sort <foo  # equivalent to: cat bar foo | sort
+```
+
+If MULTIOS is **unset**, each redirection replaces the previous one for that descriptor, though all files are still opened; `echo Hello > bar > baz` truncates `bar` and writes `Hello` into `baz`.
+
+**Caveat:** an output multio attached to an external program may exit before the copies finish writing, because the tee-process is spawned after the command is forked. Run the writer as a current-shell job to force a wait:
+
+```zsh
+{ cat file } >file1 >file2   # the {...} job waits for both files to be written
+```
+
+### Redirections With No Command
+
+When a simple command has redirections (and optional assignments) but no command name, behaviour depends on options and parameters:
+
+- If `NULLCMD` is unset or `CSH_NULLCMD` is set → an error (csh behaviour; `CSH_NULLCMD` is the csh-emulation default).
+- If `SH_NULLCMD` is set → the builtin `:` is inserted (the sh/ksh-emulation default), e.g. `> file` truncates/creates the file.
+- Otherwise `NULLCMD` is used as the command; for an input redirection `READNULLCMD` is used instead if set. Defaults are `NULLCMD=cat` and `READNULLCMD=more`, so `< file` pages the file:
+
+```zsh
+< file             # shows the contents of file, paged if stdout is a terminal
+```
+
+`NULLCMD` and `READNULLCMD` may name shell functions.
