@@ -926,6 +926,36 @@
 <li><a href="#also-note" id="toc-also-note">Also note</a></li>
 </ul></li>
 <li><a href="#d.-related-manual-pages" id="toc-d.-related-manual-pages">D. Related Manual Pages</a></li>
+<li><a href="#e.-filename-generation-globbing-from-zshexpn1" id="toc-e.-filename-generation-globbing-from-zshexpn1">E. Filename Generation (Globbing) — from zshexpn(1)</a>
+<ul>
+<li><a href="#glob-operators" id="toc-glob-operators">Glob Operators</a></li>
+<li><a href="#ksh-like-glob-operators" id="toc-ksh-like-glob-operators">ksh-like Glob Operators</a></li>
+<li><a href="#globbing-flags" id="toc-globbing-flags">Globbing Flags</a></li>
+<li><a href="#approximate-matching" id="toc-approximate-matching">Approximate Matching</a></li>
+<li><a href="#recursive-globbing" id="toc-recursive-globbing">Recursive Globbing</a></li>
+<li><a href="#glob-qualifiers" id="toc-glob-qualifiers">Glob Qualifiers</a></li>
+</ul></li>
+<li><a href="#f.-prompt-expansion-escapes-from-zshmisc1" id="toc-f.-prompt-expansion-escapes-from-zshmisc1">F. Prompt Expansion &amp; Escapes — from zshmisc(1)</a>
+<ul>
+<li><a href="#special-characters" id="toc-special-characters">Special Characters</a></li>
+<li><a href="#login-information" id="toc-login-information">Login Information</a></li>
+<li><a href="#shell-state-1" id="toc-shell-state-1">Shell State</a></li>
+<li><a href="#date-and-time" id="toc-date-and-time">Date and Time</a></li>
+<li><a href="#visual-effects" id="toc-visual-effects">Visual Effects</a></li>
+<li><a href="#conditional-substrings" id="toc-conditional-substrings">Conditional Substrings</a></li>
+</ul></li>
+<li><a href="#g.-history-expansion-from-zshexpn1" id="toc-g.-history-expansion-from-zshexpn1">G. History Expansion — from zshexpn(1)</a>
+<ul>
+<li><a href="#overview" id="toc-overview">Overview</a></li>
+<li><a href="#event-designators" id="toc-event-designators">Event Designators</a></li>
+<li><a href="#word-designators" id="toc-word-designators">Word Designators</a></li>
+<li><a href="#modifiers" id="toc-modifiers">Modifiers</a></li>
+</ul></li>
+<li><a href="#h.-multios-commandless-redirections-from-zshmisc1" id="toc-h.-multios-commandless-redirections-from-zshmisc1">H. MULTIOS &amp; Commandless Redirections — from zshmisc(1)</a>
+<ul>
+<li><a href="#multios" id="toc-multios">MULTIOS</a></li>
+<li><a href="#redirections-with-no-command" id="toc-redirections-with-no-command">Redirections With No Command</a></li>
+</ul></li>
 </ul></li>
 </ul></nav>
   </aside>
@@ -942,8 +972,9 @@
     </header>
 
     <article>
-      <p>A concise, example-driven explanation of every zsh option, in the same groups and order as the <code>zshoptions(1)</code> man page (zsh 5.9). Each entry lists what the option does, a short example, and a scenario where it’s useful.</p>
+      <p>A concise, example-driven explanation of every zsh option, in the same groups and order as the <code>zshoptions(1)</code> man page (zsh 5.9). Each entry lists what the option does, a short example, and a scenario where it’s useful. The appendix reproduces the referenced sections from related man pages (filename generation, prompt escapes, history expansion, MULTIOS) so this document is self-contained.</p>
       <p><strong>How to read the markers:</strong> <code>&lt;D&gt;</code> = on by default in all emulations; <code>&lt;C&gt;</code> <code>&lt;K&gt;</code> <code>&lt;S&gt;</code> <code>&lt;Z&gt;</code> = on by default only in csh, ksh, sh, or zsh emulation respectively. A <code>(-x)</code> after a name is the single-letter form. Set with <code>setopt NAME</code>, clear with <code>unsetopt NAME</code> (or <code>setopt NO_NAME</code>). Option names are case-insensitive and ignore underscores, so <code>allexport</code>, <code>ALL_EXPORT</code>, and <code>A__lleXP_ort</code> are all the same.</p>
+      <p><strong>Appendix contents:</strong> <a href="#a-specifying-options">A. Specifying Options</a> · <a href="#b-option-aliases">B. Option Aliases</a> · <a href="#c-single-letter-options">C. Single Letter Options</a> · <a href="#d-related-manual-pages">D. Related Manual Pages</a> · <a href="#e-filename-generation-globbing--from-zshexpn1">E. Filename Generation (Globbing)</a> · <a href="#f-prompt-expansion--escapes--from-zshmisc1">F. Prompt Expansion &amp; Escapes</a> · <a href="#g-history-expansion--from-zshexpn1">G. History Expansion</a> · <a href="#h-multios--commandless-redirections--from-zshmisc1">H. MULTIOS &amp; Commandless Redirections</a></p>
       <hr />
       <h2 id="changing-directories">Changing Directories</h2>
       <h3 id="auto_cd--j">AUTO_CD (<code>-J</code>)</h3>
@@ -1306,7 +1337,7 @@
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="pp">*</span><span class="op">(.)</span>      <span class="co"># (.) is a qualifier: matches plain files only</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="pp">*</span><span class="op">(/)</span>      <span class="co"># (/) matches directories only</span></span></code></pre></div>
       <ul>
-      <li><strong>When it’s useful:</strong> Selecting files by type or attribute (directories, symlinks, executables) directly in a glob.</li>
+      <li><strong>When it’s useful:</strong> Selecting files by type or attribute (directories, symlinks, executables) directly in a glob. See <a href="#e-filename-generation-globbing--from-zshexpn1">Appendix E</a> for the full qualifier list.</li>
       </ul>
       <h3 id="brace_ccl">BRACE_CCL</h3>
       <ul>
@@ -1382,7 +1413,7 @@
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="pp">^*</span>.o      <span class="co"># all files NOT ending in .o</span></span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="pp">*</span>.c<span class="pp">~</span>foo.c <span class="co"># all .c files except foo.c</span></span></code></pre></div>
       <ul>
-      <li><strong>When it’s useful:</strong> Powerful negation and exclusion patterns, like listing everything except certain files.</li>
+      <li><strong>When it’s useful:</strong> Powerful negation and exclusion patterns, like listing everything except certain files. See <a href="#e-filename-generation-globbing--from-zshexpn1">Appendix E</a> for the operators this unlocks.</li>
       </ul>
       <h3 id="force_float">FORCE_FLOAT</h3>
       <ul>
@@ -1458,7 +1489,7 @@
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="va">foo</span><span class="op">=</span>file123</span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${foo</span><span class="op">:</span><span class="va">s</span><span class="op">/</span><span class="st">[0-9]##</span><span class="op">/</span><span class="st">NUM</span><span class="op">/</span><span class="va">}</span>   <span class="co"># -&gt; fileNUM  (pattern-based substitution)</span></span></code></pre></div>
       <ul>
-      <li><strong>When it’s useful:</strong> Doing pattern-based (rather than literal) substitutions in history and parameter modifiers.</li>
+      <li><strong>When it’s useful:</strong> Doing pattern-based (rather than literal) substitutions in history and parameter modifiers. See <a href="#g-history-expansion--from-zshexpn1">Appendix G</a> for the modifier syntax.</li>
       </ul>
       <h3 id="ignore_braces--i-s">IGNORE_BRACES (<code>-I</code>) <code>&lt;S&gt;</code></h3>
       <ul>
@@ -1490,7 +1521,7 @@
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> !<span class="op">(*.o)</span>    <span class="co"># ksh-style: everything except .o files</span></span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> @<span class="pp">(</span><span class="ss">foo</span><span class="pp">|</span><span class="ss">bar</span><span class="pp">)</span>.c   <span class="co"># foo.c or bar.c</span></span></code></pre></div>
       <ul>
-      <li><strong>When it’s useful:</strong> Running or porting ksh-style pattern syntax in zsh.</li>
+      <li><strong>When it’s useful:</strong> Running or porting ksh-style pattern syntax in zsh. See <a href="#e-filename-generation-globbing--from-zshexpn1">Appendix E → ksh-like Glob Operators</a>.</li>
       </ul>
       <h3 id="magic_equal_subst">MAGIC_EQUAL_SUBST</h3>
       <ul>
@@ -1644,7 +1675,7 @@
 <span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a><span class="ex">!!</span>        <span class="co"># re-runs the previous command: ls /tmp</span></span>
 <span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> !$   <span class="co"># expands to the last argument of the previous line</span></span></code></pre></div>
       <ul>
-      <li><strong>When it’s useful:</strong> When you want quick shorthand like <code>!!</code> or <code>!$</code> to reuse previous commands and arguments.</li>
+      <li><strong>When it’s useful:</strong> When you want quick shorthand like <code>!!</code> or <code>!$</code> to reuse previous commands and arguments. See <a href="#g-history-expansion--from-zshexpn1">Appendix G</a> for the full designator and modifier reference.</li>
       </ul>
       <h3 id="extended_history-c">EXTENDED_HISTORY <code>&lt;C&gt;</code></h3>
       <ul>
@@ -2248,7 +2279,7 @@
       <h2 id="prompting">Prompting</h2>
       <h3 id="prompt_bang-k">PROMPT_BANG <code>&lt;K&gt;</code></h3>
       <ul>
-      <li><strong>What it does:</strong> When set, <code>!</code> is treated specially in prompt expansion (see EXPANSION OF PROMPT SEQUENCES in zshmisc(1)).</li>
+      <li><strong>What it does:</strong> When set, <code>!</code> is treated specially in prompt expansion (see <a href="#f-prompt-expansion--escapes--from-zshmisc1">Appendix F</a>).</li>
       <li><strong>Example:</strong></li>
       </ul>
       <div class="sourceCode" id="cb121"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="bu">setopt</span> PROMPT_BANG</span>
@@ -2282,7 +2313,7 @@
       </ul>
       <h3 id="prompt_percent-c-z">PROMPT_PERCENT <code>&lt;C&gt;</code> <code>&lt;Z&gt;</code></h3>
       <ul>
-      <li><strong>What it does:</strong> When set, <code>%</code> is treated specially in prompt expansion (see EXPANSION OF PROMPT SEQUENCES in zshmisc(1)).</li>
+      <li><strong>What it does:</strong> When set, <code>%</code> is treated specially in prompt expansion (see <a href="#f-prompt-expansion--escapes--from-zshmisc1">Appendix F</a>).</li>
       <li><strong>Example:</strong></li>
       </ul>
       <div class="sourceCode" id="cb124"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="bu">setopt</span> PROMPT_PERCENT</span>
@@ -2484,7 +2515,7 @@
 <span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> hi <span class="op">&gt;</span> a.txt <span class="op">&gt;</span> b.txt   <span class="co"># implicit tee: writes to both files</span></span>
 <span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&lt;</span> a.txt <span class="op">&lt;</span> b.txt       <span class="co"># implicit cat: reads both</span></span></code></pre></div>
       <ul>
-      <li><strong>When it’s useful:</strong> When you want to send one command’s output to several files, or feed several files into one command, without an explicit <code>tee</code>/<code>cat</code>.</li>
+      <li><strong>When it’s useful:</strong> When you want to send one command’s output to several files, or feed several files into one command, without an explicit <code>tee</code>/<code>cat</code>. See <a href="#h-multios--commandless-redirections--from-zshmisc1">Appendix H</a> for the full behaviour and caveats.</li>
       </ul>
       <h3 id="octal_zeroes-s">OCTAL_ZEROES <code>&lt;S&gt;</code></h3>
       <ul>
@@ -2647,7 +2678,7 @@
       <div class="sourceCode" id="cb156"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="bu">setopt</span> CSH_NULLCMD</span>
 <span id="cb156-2"><a href="#cb156-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> file.txt   <span class="co"># fails: no command given (NULLCMD not consulted)</span></span></code></pre></div>
       <ul>
-      <li><strong>When it’s useful:</strong> When you want commandless redirections to be treated as errors, csh-style.</li>
+      <li><strong>When it’s useful:</strong> When you want commandless redirections to be treated as errors, csh-style. See <a href="#h-multios--commandless-redirections--from-zshmisc1">Appendix H</a>.</li>
       </ul>
       <h3 id="ksh_arrays-k-s">KSH_ARRAYS <code>&lt;K&gt;</code> <code>&lt;S&gt;</code></h3>
       <ul>
@@ -2788,7 +2819,7 @@
       <div class="sourceCode" id="cb169"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="bu">setopt</span> SH_NULLCMD</span>
 <span id="cb169-2"><a href="#cb169-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> file.txt   <span class="co"># behaves as &#39;: &gt; file.txt&#39; (truncates/creates the file)</span></span></code></pre></div>
       <ul>
-      <li><strong>When it’s useful:</strong> When you want commandless redirections to default to <code>:</code> like POSIX sh, rather than zsh’s NULLCMD.</li>
+      <li><strong>When it’s useful:</strong> When you want commandless redirections to default to <code>:</code> like POSIX sh, rather than zsh’s NULLCMD. See <a href="#h-multios--commandless-redirections--from-zshmisc1">Appendix H</a>.</li>
       </ul>
       <h3 id="sh_option_letters-k-s">SH_OPTION_LETTERS <code>&lt;K&gt;</code> <code>&lt;S&gt;</code></h3>
       <ul>
@@ -3325,14 +3356,842 @@
       </table>
       <h2 id="d.-related-manual-pages">D. Related Manual Pages</h2>
       <ul>
-      <li><strong>zshoptions(1)</strong> — the source for this document (zsh 5.9, dated May 14 2022).</li>
+      <li><strong>zshoptions(1)</strong> — the source for the option descriptions above (zsh 5.9, dated May 14 2022).</li>
       <li><strong>zshbuiltins(1)</strong> — details of the <code>cd</code>, <code>setopt</code>, <code>unsetopt</code>, <code>set</code>, <code>typeset</code>, <code>disable</code>, and other builtins referenced above.</li>
-      <li><strong>zshmisc(1)</strong> — “EXPANSION OF PROMPT SEQUENCES” (referenced by <code>PROMPT_BANG</code> and <code>PROMPT_PERCENT</code>), redirection, and job-control semantics.</li>
-      <li><strong>zshexpn(1)</strong> — filename expansion, filename generation (globbing), glob qualifiers, and history expansion referenced throughout Expansion and Globbing and History.</li>
+      <li><strong>zshmisc(1)</strong> — prompt sequence expansion (Appendix F), MULTIOS and commandless redirection (Appendix H), plus redirection and job-control semantics.</li>
+      <li><strong>zshexpn(1)</strong> — filename generation / globbing (Appendix E) and history expansion (Appendix G), plus filename and parameter expansion.</li>
       <li><strong>zshparam(1)</strong> — parameters such as <code>CORRECT_IGNORE</code>, <code>CORRECT_IGNORE_FILE</code>, <code>KEYBOARD_HACK</code>, <code>PROMPT_EOL_MARK</code>, <code>HISTFILE</code>, <code>HISTSIZE</code>, and <code>SAVEHIST</code>.</li>
       <li><strong>zshzle(1)</strong> — the Zsh Line Editor, <code>bindkey</code>, and widget behaviour referenced by the Zle and Completion groups.</li>
       <li><strong>zshcompsys(1)</strong> / <strong>zshcompwid(1)</strong> — the completion system underlying the Completion group.</li>
       </ul>
+      <p>The remaining appendices reproduce the most-referenced of these sections so this document stands on its own.</p>
+      <h2 id="e.-filename-generation-globbing-from-zshexpn1">E. Filename Generation (Globbing) — from zshexpn(1)</h2>
+      <p>If a word contains an unquoted instance of one of the characters <code>*</code>, <code>(</code>, <code>|</code>, <code>&lt;</code>, <code>[</code>, or <code>?</code>, it is regarded as a pattern for filename generation, unless the <code>GLOB</code> option is unset. If the <code>EXTENDED_GLOB</code> option is set, the <code>^</code> and <code>#</code> characters also denote a pattern; otherwise they are not treated specially by the shell.</p>
+      <p>The word is replaced with a list of sorted filenames that match the pattern. If no matching pattern is found, the shell gives an error message, unless the <code>NULL_GLOB</code> option is set, in which case the word is deleted; or unless the <code>NOMATCH</code> option is unset, in which case the word is left unchanged.</p>
+      <p>In filename generation, the character <code>/</code> must be matched explicitly; also, a <code>.</code> must be matched explicitly at the beginning of a pattern or after a <code>/</code>, unless the <code>GLOB_DOTS</code> option is set. No filename generation pattern matches the files <code>.</code> or <code>..</code>. In other instances of pattern matching, the <code>/</code> and <code>.</code> are not treated specially.</p>
+      <h3 id="glob-operators">Glob Operators</h3>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Operator</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>*</code></td>
+      <td>Matches any string, including the null string.</td>
+      </tr>
+      <tr>
+      <td><code>?</code></td>
+      <td>Matches any character.</td>
+      </tr>
+      <tr>
+      <td><code>[...]</code></td>
+      <td>Matches any of the enclosed characters. Ranges are given as <code>a-z</code>. A <code>-</code> or <code>]</code> may be matched by placing it first. Named classes <code>[:name:]</code> are also allowed (see below).</td>
+      </tr>
+      <tr>
+      <td><code>[^...]</code>, <code>[!...]</code></td>
+      <td>Like <code>[...]</code>, but matches any character <strong>not</strong> in the set.</td>
+      </tr>
+      <tr>
+      <td><code>&lt;x-y&gt;</code></td>
+      <td>Matches any number in the range <code>x</code> to <code>y</code>, inclusive. Either bound may be omitted; <code>&lt;-&gt;</code> matches any number.</td>
+      </tr>
+      <tr>
+      <td><code>(...)</code></td>
+      <td>Matches the enclosed pattern; used for grouping.</td>
+      </tr>
+      <tr>
+      <td><code>x\|y</code></td>
+      <td>Matches either <code>x</code> or <code>y</code>. Lowest precedence; the <code>\|</code> must be within parentheses to avoid being read as a pipeline.</td>
+      </tr>
+      <tr>
+      <td><code>^x</code></td>
+      <td>(<code>EXTENDED_GLOB</code>) Matches anything except the pattern <code>x</code>.</td>
+      </tr>
+      <tr>
+      <td><code>x~y</code></td>
+      <td>(<code>EXTENDED_GLOB</code>) Matches anything matching <code>x</code> but not <code>y</code>. In <code>y</code>, <code>/</code> and <code>.</code> are not special.</td>
+      </tr>
+      <tr>
+      <td><code>x#</code></td>
+      <td>(<code>EXTENDED_GLOB</code>) Matches zero or more occurrences of <code>x</code>.</td>
+      </tr>
+      <tr>
+      <td><code>x##</code></td>
+      <td>(<code>EXTENDED_GLOB</code>) Matches one or more occurrences of <code>x</code>.</td>
+      </tr>
+      </tbody>
+      </table>
+      <p><strong>Named character classes</strong> usable inside <code>[...]</code> (note the double brackets, e.g. <code>[[:alnum:]]</code>). Locale-sensitive set: <code>[:alnum:]</code>, <code>[:alpha:]</code>, <code>[:ascii:]</code>, <code>[:blank:]</code>, <code>[:cntrl:]</code>, <code>[:digit:]</code>, <code>[:graph:]</code>, <code>[:lower:]</code>, <code>[:print:]</code>, <code>[:punct:]</code>, <code>[:space:]</code>, <code>[:upper:]</code>, <code>[:xdigit:]</code>. Shell-internal set: <code>[:IDENT:]</code> (valid in a shell identifier), <code>[:IFS:]</code> (a character in <code>$IFS</code>), <code>[:IFSSPACE:]</code> (IFS whitespace), <code>[:INCOMPLETE:]</code> (starts an incomplete multibyte char), <code>[:INVALID:]</code> (does not start a valid multibyte char), <code>[:WORD:]</code> (part of a word per <code>$WORDCHARS</code>).</p>
+      <p>Precautions and precedence: with numeric ranges, <code>&lt;0-9&gt;*</code> matches any number at the start of the string (longest-match rule); use <code>&lt;0-9&gt;[^[:digit:]]*</code> instead. Grouping cannot span <code>/</code>, except that <code>(pat/)#</code> as a complete path segment matches a sequence of directories, e.g. <code>foo/(a*/)#bar</code> matches <code>foo/bar</code>, <code>foo/any/bar</code>, etc. Operator precedence is (highest) <code>^</code>, <code>/</code>, <code>~</code>, <code>|</code> (lowest); <code>#</code>/<code>##</code> bind to the shortest preceding unit, so <code>12#</code> = <code>1(2#)</code>.</p>
+      <h3 id="ksh-like-glob-operators">ksh-like Glob Operators</h3>
+      <p>If <code>KSH_GLOB</code> is set, a <code>@</code>, <code>*</code>, <code>+</code>, <code>?</code> or <code>!</code> immediately before a <code>(</code> modifies the group:</p>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Operator</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>@(...)</code></td>
+      <td>Match the pattern once. (Like <code>(...)</code>.)</td>
+      </tr>
+      <tr>
+      <td><code>*(...)</code></td>
+      <td>Match any number of occurrences. (Like <code>(...)#</code>, no recursive directory search.)</td>
+      </tr>
+      <tr>
+      <td><code>+(...)</code></td>
+      <td>Match at least one occurrence. (Like <code>(...)##</code>, no recursive directory search.)</td>
+      </tr>
+      <tr>
+      <td><code>?(...)</code></td>
+      <td>Match zero or one occurrence. (Like <code>(\|...)</code>.)</td>
+      </tr>
+      <tr>
+      <td><code>!(...)</code></td>
+      <td>Match anything but the expression. (Like <code>(^(...))</code>.)</td>
+      </tr>
+      </tbody>
+      </table>
+      <h3 id="globbing-flags">Globbing Flags</h3>
+      <p>Flags of the form <code>(#X)</code> affect text to their right up to the end of the enclosing group/pattern; they require <code>EXTENDED_GLOB</code>:</p>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Flag</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>i</code></td>
+      <td>Case insensitive.</td>
+      </tr>
+      <tr>
+      <td><code>l</code></td>
+      <td>Lowercase in pattern matches upper or lower; uppercase still matches only uppercase.</td>
+      </tr>
+      <tr>
+      <td><code>I</code></td>
+      <td>Case sensitive: locally negates <code>i</code>/<code>l</code>.</td>
+      </tr>
+      <tr>
+      <td><code>b</code></td>
+      <td>Activate backreferences: matched groups go into <code>$match</code>, start indices into <code>$mbegin</code>, end indices into <code>$mend</code> (only the first nine active parens; not in filename generation).</td>
+      </tr>
+      <tr>
+      <td><code>B</code></td>
+      <td>Deactivate backreferences.</td>
+      </tr>
+      <tr>
+      <td><code>cN,M</code></td>
+      <td>Require between <code>N</code> and <code>M</code> matches of the preceding unit (like <code>{N,M}</code>). Forms: <code>(#cN)</code> exactly N, <code>(#c,M)</code>, <code>(#cN,)</code>.</td>
+      </tr>
+      <tr>
+      <td><code>m</code></td>
+      <td>Set <code>$MATCH</code>/<code>$MBEGIN</code>/<code>$MEND</code> to the whole matched string and its indices (must be in effect at pattern end; not in filename generation).</td>
+      </tr>
+      <tr>
+      <td><code>M</code></td>
+      <td>Deactivate the <code>m</code> flag.</td>
+      </tr>
+      <tr>
+      <td><code>anum</code></td>
+      <td>Approximate matching allowing <code>num</code> errors (see below).</td>
+      </tr>
+      <tr>
+      <td><code>s</code>, <code>e</code></td>
+      <td><code>(#s)</code> matches only at the start of the test string, <code>(#e)</code> only at the end (like <code>^</code> and <code>$</code>). Each must appear alone.</td>
+      </tr>
+      <tr>
+      <td><code>q</code></td>
+      <td>Ignore the flag and everything up to the closing paren — lets glob qualifiers coexist with pattern matching, e.g. <code>(#b)(*).c(#q.)</code>.</td>
+      </tr>
+      <tr>
+      <td><code>u</code></td>
+      <td>Respect the locale for multibyte characters (overrides <code>MULTIBYTE</code>).</td>
+      </tr>
+      <tr>
+      <td><code>U</code></td>
+      <td>Treat all characters as single bytes (overrides <code>MULTIBYTE</code>).</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>Example: <code>(#i)FOOXX</code> matches <code>fooxx</code>; <code>(#ia2)readme</code> matches <code>readme</code> case-insensitively with up to two errors.</p>
+      <div class="sourceCode" id="cb186"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb186-1"><a href="#cb186-1" aria-hidden="true" tabindex="-1"></a><span class="va">foo</span><span class="op">=</span><span class="st">&quot;a_string_with_a_message&quot;</span></span>
+<span id="cb186-2"><a href="#cb186-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="va">$foo</span> <span class="ot">=</span> <span class="pp">(</span><span class="ss">a</span><span class="pp">|</span><span class="ss">an</span><span class="pp">)</span>_<span class="op">(#b)</span><span class="pp">(*)</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb186-3"><a href="#cb186-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span> <span class="va">${foo</span><span class="op">[</span><span class="va">$mbegin</span><span class="op">[</span><span class="dv">1</span><span class="op">],</span><span class="va">$mend</span><span class="op">[</span><span class="dv">1</span><span class="op">]]</span><span class="va">}</span>   <span class="co"># prints: string_with_a_message</span></span>
+<span id="cb186-4"><a href="#cb186-4" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb186-5"><a href="#cb186-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb186-6"><a href="#cb186-6" aria-hidden="true" tabindex="-1"></a><span class="va">arr</span><span class="op">=</span><span class="va">(</span>veldt jynx grimps waqf zho buck<span class="va">)</span></span>
+<span id="cb186-7"><a href="#cb186-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="va">${arr</span><span class="op">//(#m)</span><span class="pp">[</span><span class="st">aeiou</span><span class="pp">]</span><span class="op">/</span><span class="va">${(</span><span class="op">U</span><span class="va">)MATCH}}</span>  <span class="co"># uppercases every vowel</span></span></code></pre></div>
+      <h3 id="approximate-matching">Approximate Matching</h3>
+      <p>With <code>(#anum)</code>, up to <code>num</code> errors are tolerated. Four error types are recognised: (1) different characters (<code>fooxbar</code> vs <code>fooybar</code>); (2) transposition (<code>banana</code> vs <code>abnana</code>); (3) a missing character in the target (<code>road</code> vs <code>rod</code>); (4) an extra character in the target (<code>stove</code> vs <code>strove</code>). Non-literal parts, initial dots, and all slashes must match exactly. The maximum errors may be varied locally via grouping, e.g. <code>(#a1)cat((#a0)dog)fox</code> allows one error but not in <code>dog</code>. Place <code>(#a1)</code> after path segments known to be correct, since every directory must otherwise be scanned for approximate matches.</p>
+      <h3 id="recursive-globbing">Recursive Globbing</h3>
+      <p><code>(foo/)#</code> matches zero or more directories matching <code>foo</code>. As shorthand, <code>**/</code> is equivalent to <code>(*/)#</code> (so it also matches the current directory):</p>
+      <div class="sourceCode" id="cb187"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb187-1"><a href="#cb187-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-ld</span> <span class="at">--</span> <span class="pp">**</span>/bar       <span class="co"># recursive search for files named bar</span></span>
+<span id="cb187-2"><a href="#cb187-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-ld</span> <span class="at">--</span> <span class="pp">***</span>/bar      <span class="co"># same, but follows symbolic links</span></span></code></pre></div>
+      <p>Neither <code>**/</code> nor <code>***/</code> combines with other globbing in the same path segment. With <code>GLOB_STAR_SHORT</code> set, <code>**</code> and <code>***</code> not immediately followed by <code>/</code> imply an extra <code>/*</code>, so <code>**.c</code> == <code>**/*.c</code>.</p>
+      <h3 id="glob-qualifiers">Glob Qualifiers</h3>
+      <p>Patterns may end in a parenthesised list of qualifiers that filters which matches are kept. With <code>BARE_GLOB_QUAL</code>, a trailing <code>(...)</code> with no <code>|</code>/<code>(</code>/special-<code>~</code> is taken as qualifiers; force a literal group by doubling, e.g. <code>((^x))</code>. With <code>EXTENDED_GLOB</code>, the form <code>(#qx)</code> is also available and multiple <code>(#q...)</code> groups may be chained (logical AND).</p>
+      <p><strong>File-type qualifiers:</strong></p>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Qualifier</th>
+      <th>Selects</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>/</code></td>
+      <td>directories</td>
+      </tr>
+      <tr>
+      <td><code>F</code></td>
+      <td>full (non-empty) directories (use <code>(/^F)</code> for empty directories)</td>
+      </tr>
+      <tr>
+      <td><code>.</code></td>
+      <td>plain files</td>
+      </tr>
+      <tr>
+      <td><code>@</code></td>
+      <td>symbolic links</td>
+      </tr>
+      <tr>
+      <td><code>=</code></td>
+      <td>sockets</td>
+      </tr>
+      <tr>
+      <td><code>p</code></td>
+      <td>named pipes (FIFOs)</td>
+      </tr>
+      <tr>
+      <td><code>*</code></td>
+      <td>executable plain files</td>
+      </tr>
+      <tr>
+      <td><code>%</code>, <code>%b</code>, <code>%c</code></td>
+      <td>device files; block special; character special</td>
+      </tr>
+      </tbody>
+      </table>
+      <p><strong>Permission qualifiers:</strong> <code>r</code>/<code>w</code>/<code>x</code> (owner read/write/execute), <code>A</code>/<code>I</code>/<code>E</code> (group), <code>R</code>/<code>W</code>/<code>X</code> (world), <code>s</code>/<code>S</code>/<code>t</code> (setuid/setgid/sticky), <code>U</code>/<code>G</code> (owned by effective uid/gid). <code>fspec</code> matches explicit mode bits, e.g. <code>*(f70?)</code>, <code>*(f-100)</code>, <code>*(f:gu+w,o-rx:)</code>.</p>
+      <p><strong>Other qualifiers:</strong></p>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Qualifier</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>estring</code> / <code>+cmd</code></td>
+      <td>Include the file only if the shell code returns zero status. <code>$REPLY</code> holds the filename and may be rewritten; <code>reply</code> may set an array. E.g. <code>ls -ld -- *(+nt)</code> with a helper function <code>nt</code>.</td>
+      </tr>
+      <tr>
+      <td><code>ddev</code></td>
+      <td>files on device <code>dev</code></td>
+      </tr>
+      <tr>
+      <td><code>l[-\|+]ct</code></td>
+      <td>link count less than / greater than / equal to <code>ct</code></td>
+      </tr>
+      <tr>
+      <td><code>uid</code> / <code>gid</code></td>
+      <td>owned by user/group id or name, e.g. <code>u:foo:</code></td>
+      </tr>
+      <tr>
+      <td><code>a[Mwhms][-\|+]n</code></td>
+      <td>accessed n units ago (<code>-</code> within, <code>+</code> more than); unit <code>M</code>onths/<code>w</code>eeks/<code>h</code>ours/<code>m</code>inutes/<code>s</code>econds/days</td>
+      </tr>
+      <tr>
+      <td><code>m...</code></td>
+      <td>like <code>a</code> but modification time</td>
+      </tr>
+      <tr>
+      <td><code>c...</code></td>
+      <td>like <code>a</code> but inode change time</td>
+      </tr>
+      <tr>
+      <td><code>L[+\|-]n</code></td>
+      <td>size less/more/exactly n bytes; suffix <code>k</code>/<code>m</code>/<code>p</code> (also <code>g</code>/<code>t</code> on some systems) for KB/MB/512-byte-blocks</td>
+      </tr>
+      <tr>
+      <td><code>^</code></td>
+      <td>negate following qualifiers</td>
+      </tr>
+      <tr>
+      <td><code>-</code></td>
+      <td>toggle qualifiers between symlinks and their targets</td>
+      </tr>
+      <tr>
+      <td><code>M</code>, <code>T</code>, <code>N</code>, <code>D</code>, <code>n</code></td>
+      <td>apply <code>MARK_DIRS</code>, <code>LIST_TYPES</code>, <code>NULL_GLOB</code>, <code>GLOB_DOTS</code>, <code>NUMERIC_GLOB_SORT</code> for this pattern</td>
+      </tr>
+      <tr>
+      <td><code>Yn</code></td>
+      <td>short-circuit: expand to at most <code>n</code> filenames</td>
+      </tr>
+      <tr>
+      <td><code>oc</code> / <code>Oc</code></td>
+      <td>sort ascending/descending by <code>c</code>: <code>n</code>ame, <code>L</code>ength, <code>l</code>inks, <code>a</code>ccess, <code>m</code>odification, <code>c</code>hange time, <code>d</code>irectories, <code>N</code>o-sort, or <code>e</code>/<code>+</code> shell code</td>
+      </tr>
+      <tr>
+      <td><code>[beg,end]</code></td>
+      <td>array-subscript selection of matches, e.g. <code>*(-OL[1,3])</code> = three largest files</td>
+      </tr>
+      <tr>
+      <td><code>Pstr</code></td>
+      <td>prepend <code>str</code> as a separate word before each match (append if <code>^</code> active)</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>Sublists separated by commas are OR’ed (qualifiers within a sublist are AND’ed). A <code>:</code> introduces history-style modifiers (see Appendix G), each preceded by its own <code>:</code>.</p>
+      <div class="sourceCode" id="cb188"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-ld</span> <span class="at">--</span> <span class="pp">*</span><span class="op">(-/)</span>          <span class="co"># dirs and symlinks pointing to dirs</span></span>
+<span id="cb188-2"><a href="#cb188-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-ld</span> <span class="at">--</span> <span class="pp">*</span><span class="op">(-@)</span>          <span class="co"># broken symlinks</span></span>
+<span id="cb188-3"><a href="#cb188-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-ld</span> <span class="at">--</span> <span class="pp">*</span><span class="op">(W,X)</span>         <span class="co"># world-writable or world-executable files</span></span>
+<span id="cb188-4"><a href="#cb188-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="at">-rC1</span> /tmp/foo<span class="pp">*</span><span class="op">(u</span><span class="dv">0</span><span class="op">^@:</span><span class="va">t</span><span class="op">)</span>   <span class="co"># basenames of root-owned foo* files, ignoring symlinks</span></span>
+<span id="cb188-5"><a href="#cb188-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-ld</span> <span class="at">--</span> <span class="pp">*</span>.<span class="pp">*~(</span><span class="ss">lex</span><span class="pp">|</span><span class="ss">parse</span><span class="pp">)</span>.<span class="pp">[</span><span class="st">ch</span><span class="pp">]</span><span class="op">(^D^l1)</span>  <span class="co"># link-count-1 dotted-name files except lex/parse .c/.h</span></span></code></pre></div>
+      <h2 id="f.-prompt-expansion-escapes-from-zshmisc1">F. Prompt Expansion &amp; Escapes — from zshmisc(1)</h2>
+      <p>Prompt sequences undergo a special form of expansion, also available via <code>print -P</code>. If <code>PROMPT_SUBST</code> is set, the prompt is first subjected to parameter expansion, command substitution and arithmetic expansion. If <code>PROMPT_BANG</code> is set, a <code>!</code> is replaced by the current history event number (<code>!!</code> for a literal <code>!</code>). If <code>PROMPT_PERCENT</code> is set, <code>%</code> escape sequences are expanded; many take an optional integer between the <code>%</code> and the sequence character.</p>
+      <h3 id="special-characters">Special Characters</h3>
+      <table>
+      <thead>
+      <tr>
+      <th>Escape</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>%%</code></td>
+      <td>A literal <code>%</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%)</code></td>
+      <td>A literal <code>)</code>.</td>
+      </tr>
+      </tbody>
+      </table>
+      <h3 id="login-information">Login Information</h3>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Escape</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>%l</code></td>
+      <td>The line (tty) logged in on, <code>/dev/</code> and <code>/dev/tty</code> prefixes stripped.</td>
+      </tr>
+      <tr>
+      <td><code>%M</code></td>
+      <td>The full machine hostname.</td>
+      </tr>
+      <tr>
+      <td><code>%m</code></td>
+      <td>Hostname up to the first <code>.</code>. An integer selects that many components; negative shows trailing ones.</td>
+      </tr>
+      <tr>
+      <td><code>%n</code></td>
+      <td><code>$USERNAME</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%y</code></td>
+      <td>The line (tty), <code>/dev/</code> stripped but <code>/dev/tty</code> <strong>not</strong> treated specially.</td>
+      </tr>
+      </tbody>
+      </table>
+      <h3 id="shell-state-1">Shell State</h3>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Escape</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>%#</code></td>
+      <td><code>#</code> if the shell is privileged, else <code>%</code>. Equivalent to <code>%(!.#.%%)</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%?</code></td>
+      <td>Return status of the last command before the prompt.</td>
+      </tr>
+      <tr>
+      <td><code>%_</code></td>
+      <td>Parser state (started constructs like <code>if</code>/<code>for</code>); an integer prints that many. Useful in <code>PS2</code>/<code>PS4</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%^</code></td>
+      <td>Parser state in reverse; often used in <code>RPS2</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%d</code>, <code>%/</code></td>
+      <td>Current working directory. An integer shows that many trailing components (0 = whole path); negative = leading.</td>
+      </tr>
+      <tr>
+      <td><code>%~</code></td>
+      <td>As <code>%d</code>/<code>%/</code> but contract <code>$HOME</code> (or a named directory prefix) to <code>~</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%e</code></td>
+      <td>Evaluation depth of the current sourced file/function/eval; useful in <code>$PS4</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%h</code>, <code>%!</code></td>
+      <td>Current history event number.</td>
+      </tr>
+      <tr>
+      <td><code>%i</code></td>
+      <td>Line number being executed in the script/file/function of <code>%N</code>; useful in <code>$PS4</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%I</code></td>
+      <td>Like <code>%i</code> but always the line number in the file <code>%x</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%j</code></td>
+      <td>The number of jobs.</td>
+      </tr>
+      <tr>
+      <td><code>%L</code></td>
+      <td>The current value of <code>$SHLVL</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%N</code></td>
+      <td>Name of the script/sourced file/function most recently started (else <code>$0</code>). Integer = trailing path components; negative = leading.</td>
+      </tr>
+      <tr>
+      <td><code>%x</code></td>
+      <td>Name of the file containing the source being executed (functions/evals show their defining file).</td>
+      </tr>
+      <tr>
+      <td><code>%c</code>, <code>%.</code>, <code>%C</code></td>
+      <td>Trailing component(s) of the cwd (<code>%c</code>/<code>%1~</code>, <code>%C</code>/<code>%1/</code>); deprecated.</td>
+      </tr>
+      </tbody>
+      </table>
+      <h3 id="date-and-time">Date and Time</h3>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Escape</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>%D</code></td>
+      <td>Date as yy-mm-dd.</td>
+      </tr>
+      <tr>
+      <td><code>%T</code></td>
+      <td>Time of day, 24-hour.</td>
+      </tr>
+      <tr>
+      <td><code>%t</code>, <code>%@</code></td>
+      <td>Time of day, 12-hour am/pm.</td>
+      </tr>
+      <tr>
+      <td><code>%*</code></td>
+      <td>Time of day, 24-hour with seconds.</td>
+      </tr>
+      <tr>
+      <td><code>%w</code></td>
+      <td>Date as day-dd.</td>
+      </tr>
+      <tr>
+      <td><code>%W</code></td>
+      <td>Date as mm/dd/yy.</td>
+      </tr>
+      <tr>
+      <td><code>%D{string}</code></td>
+      <td><code>string</code> formatted with <code>strftime(3)</code>; zsh extensions <code>%f</code>/<code>%K</code>/<code>%L</code> give no-leading-zero day/24h/12h, and <code>%[digits].</code> gives sub-second decimals (<code>%6.</code> microseconds, <code>%9.</code>/<code>%N</code> nanoseconds). A <code>-</code> after <code>%</code> strips leading zero/space for <code>d f H k l m M S y</code>.</td>
+      </tr>
+      </tbody>
+      </table>
+      <h3 id="visual-effects">Visual Effects</h3>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Escape</th>
+      <th>Meaning</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>%B</code> (<code>%b</code>)</td>
+      <td>Start (stop) boldface.</td>
+      </tr>
+      <tr>
+      <td><code>%E</code></td>
+      <td>Clear to end of line.</td>
+      </tr>
+      <tr>
+      <td><code>%U</code> (<code>%u</code>)</td>
+      <td>Start (stop) underline.</td>
+      </tr>
+      <tr>
+      <td><code>%S</code> (<code>%s</code>)</td>
+      <td>Start (stop) standout.</td>
+      </tr>
+      <tr>
+      <td><code>%F</code> (<code>%f</code>)</td>
+      <td>Start (stop) foreground colour, e.g. <code>%F{red}</code> or numeric.</td>
+      </tr>
+      <tr>
+      <td><code>%K</code> (<code>%k</code>)</td>
+      <td>Start (stop) background colour; same syntax as <code>%F</code>.</td>
+      </tr>
+      <tr>
+      <td><code>%{...%}</code></td>
+      <td>Include a literal escape sequence that does not move the cursor.</td>
+      </tr>
+      <tr>
+      <td><code>%G</code></td>
+      <td>Within <code>%{...%}</code>, count as one character width (integer for other widths).</td>
+      </tr>
+      </tbody>
+      </table>
+      <h3 id="conditional-substrings">Conditional Substrings</h3>
+      <p><code>%v</code> is the first element of <code>$psvar</code> (integer selects an element; negative counts from the end).</p>
+      <p><strong>Ternary:</strong> <code>%(x.true-text.false-text)</code> — the character after <code>x</code> separates the branches; a <code>)</code> in false-text is written <code>%)</code>. A positive integer <code>n</code> before/after <code>(</code> sets the comparison value. Test characters <code>x</code>:</p>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Test</th>
+      <th>True if…</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>!</code></td>
+      <td>the shell is privileged</td>
+      </tr>
+      <tr>
+      <td><code>#</code></td>
+      <td>the effective uid is <code>n</code></td>
+      </tr>
+      <tr>
+      <td><code>?</code></td>
+      <td>the last exit status was <code>n</code></td>
+      </tr>
+      <tr>
+      <td><code>_</code></td>
+      <td>at least <code>n</code> shell constructs are started</td>
+      </tr>
+      <tr>
+      <td><code>C</code>/<code>/</code>, <code>c</code>/<code>.</code>/<code>~</code></td>
+      <td>the (absolute / prefix-replaced) path has at least <code>n</code> elements</td>
+      </tr>
+      <tr>
+      <td><code>D</code>, <code>d</code></td>
+      <td>month equals <code>n</code> (Jan=0); day of month equals <code>n</code></td>
+      </tr>
+      <tr>
+      <td><code>e</code>, <code>g</code>, <code>j</code>, <code>L</code>, <code>S</code></td>
+      <td>eval depth / effective gid / job count / <code>$SHLVL</code> / <code>$SECONDS</code> at least <code>n</code></td>
+      </tr>
+      <tr>
+      <td><code>l</code></td>
+      <td>at least <code>n</code> characters already printed on the line (negative = before the opposite margin)</td>
+      </tr>
+      <tr>
+      <td><code>T</code>, <code>t</code></td>
+      <td>time in hours / minutes equals <code>n</code></td>
+      </tr>
+      <tr>
+      <td><code>v</code>, <code>V</code></td>
+      <td><code>$psvar</code> has at least <code>n</code> elements / element <code>n</code> is set and non-empty</td>
+      </tr>
+      <tr>
+      <td><code>w</code></td>
+      <td>day of week equals <code>n</code> (Sun=0)</td>
+      </tr>
+      </tbody>
+      </table>
+      <p><strong>Truncation:</strong> <code>%&lt;string&lt;</code>, <code>%&gt;string&gt;</code> (and deprecated <code>%[xstringx]</code>) truncate the rest of the prompt to the numeric length, replacing the cut part with <code>string</code>. <code>&lt;</code> truncates the left, <code>&gt;</code> the right; a negative length leaves that many characters before the margin. A zero-argument form like <code>%&lt;&lt;</code> ends the truncation range, e.g. <code>%10&lt;...&lt;%~%&lt;&lt;%#</code>.</p>
+      <h2 id="g.-history-expansion-from-zshexpn1">G. History Expansion — from zshexpn(1)</h2>
+      <p>History expansion lets you reuse words from previous command lines. Each command is saved as a numbered <em>history event</em> (size controlled by <code>HISTSIZE</code>); the number in your prompt (<code>%h</code>) is the one to be assigned next.</p>
+      <h3 id="overview">Overview</h3>
+      <p>A history expansion begins with the first character of <code>$histchars</code> (default <code>!</code>) and may appear anywhere on the line, including inside double quotes — but not inside <code>'...'</code> or <code>$'...'</code>, nor when escaped with a backslash. The <code>!</code> is followed by an optional <em>event designator</em> and an optional <em>word designator</em>; if neither is present, no expansion occurs. Expanded lines are echoed before execution, and it is the expanded form that is recorded. History expansions do not nest.</p>
+      <p>By default a reference with no event designator refers to the same event as any preceding reference on the line, or to the previous command if it is the only one. With <code>CSH_JUNKIE_HISTORY</code> set, every bare reference refers to the previous command. The sequence <code>^old^new</code> (where <code>^</code> is the second <code>$histchars</code> character) repeats the last command replacing <code>old</code> with <code>new</code>; it is short for <code>!!:s^old^new^</code>, so further modifiers may follow (e.g. <code>^old^new^:G</code> for global). The sequence <code>!"</code> temporarily disables the history mechanism for the rest of the current list.</p>
+      <h3 id="event-designators">Event Designators</h3>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Designator</th>
+      <th>Refers to</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>!</code></td>
+      <td>Start a history expansion, except when followed by a blank, newline, <code>=</code> or <code>(</code>.</td>
+      </tr>
+      <tr>
+      <td><code>!!</code></td>
+      <td>The previous command.</td>
+      </tr>
+      <tr>
+      <td><code>!n</code></td>
+      <td>Command-line <code>n</code>.</td>
+      </tr>
+      <tr>
+      <td><code>!-n</code></td>
+      <td>The current command minus <code>n</code>.</td>
+      </tr>
+      <tr>
+      <td><code>!str</code></td>
+      <td>The most recent command starting with <code>str</code>.</td>
+      </tr>
+      <tr>
+      <td><code>!?str[?]</code></td>
+      <td>The most recent command containing <code>str</code> (trailing <code>?</code> needed before following text/modifiers).</td>
+      </tr>
+      <tr>
+      <td><code>!#</code></td>
+      <td>The current command line typed so far.</td>
+      </tr>
+      <tr>
+      <td><code>!{...}</code></td>
+      <td>Insulate a reference from adjacent characters.</td>
+      </tr>
+      </tbody>
+      </table>
+      <h3 id="word-designators">Word Designators</h3>
+      <p>A <code>:</code> usually separates the event from the word designator; it may be omitted if the word designator begins with <code>^</code>, <code>$</code>, <code>*</code>, <code>-</code> or <code>%</code>.</p>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Designator</th>
+      <th>Selects</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>0</code></td>
+      <td>The first input word (command).</td>
+      </tr>
+      <tr>
+      <td><code>n</code></td>
+      <td>The nth argument.</td>
+      </tr>
+      <tr>
+      <td><code>^</code></td>
+      <td>The first argument (i.e. <code>1</code>).</td>
+      </tr>
+      <tr>
+      <td><code>$</code></td>
+      <td>The last argument.</td>
+      </tr>
+      <tr>
+      <td><code>%</code></td>
+      <td>The word matched by the most recent <code>?str</code> search (only valid in <code>!%</code>, <code>!:%</code> or <code>!?str?:%</code> after a <code>!?</code> search).</td>
+      </tr>
+      <tr>
+      <td><code>x-y</code></td>
+      <td>A range of words; <code>x</code> defaults to <code>0</code>.</td>
+      </tr>
+      <tr>
+      <td><code>*</code></td>
+      <td>All the arguments, or nothing if there are none.</td>
+      </tr>
+      <tr>
+      <td><code>x*</code></td>
+      <td>Abbreviates <code>x-$</code>.</td>
+      </tr>
+      <tr>
+      <td><code>x-</code></td>
+      <td>Like <code>x*</code> but omitting the last word.</td>
+      </tr>
+      </tbody>
+      </table>
+      <h3 id="modifiers">Modifiers</h3>
+      <p>After the word designator you may add a sequence of modifiers, each preceded by <code>:</code>. These also work on the results of filename generation and parameter expansion (except where noted).</p>
+      <table>
+      <colgroup>
+      <col style="width: 50%" />
+      <col style="width: 50%" />
+      </colgroup>
+      <thead>
+      <tr>
+      <th>Modifier</th>
+      <th>Effect</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>a</code></td>
+      <td>Turn a filename into an absolute path (logical: resolves <code>.</code> and <code>..</code> textually, not via the filesystem).</td>
+      </tr>
+      <tr>
+      <td><code>A</code></td>
+      <td>Like <code>a</code>, then resolve symbolic links via <code>realpath(3)</code>.</td>
+      </tr>
+      <tr>
+      <td><code>c</code></td>
+      <td>Resolve a command name to a full path via <code>$PATH</code>.</td>
+      </tr>
+      <tr>
+      <td><code>e</code></td>
+      <td>Leave only the filename extension after the <code>.</code>.</td>
+      </tr>
+      <tr>
+      <td><code>h</code> <code>[digits]</code></td>
+      <td>Remove a trailing path component (<code>dirname</code>); with digits, keep that many leading components.</td>
+      </tr>
+      <tr>
+      <td><code>l</code></td>
+      <td>Convert to lowercase.</td>
+      </tr>
+      <tr>
+      <td><code>p</code></td>
+      <td>Print the new command but do not execute it (history expansion only).</td>
+      </tr>
+      <tr>
+      <td><code>P</code></td>
+      <td>Turn a filename into an absolute, symlink-free path like <code>realpath(3)</code>, but preserving non-existent trailing components.</td>
+      </tr>
+      <tr>
+      <td><code>q</code></td>
+      <td>Quote the words, escaping further substitution.</td>
+      </tr>
+      <tr>
+      <td><code>Q</code></td>
+      <td>Remove one level of quotes.</td>
+      </tr>
+      <tr>
+      <td><code>r</code></td>
+      <td>Remove a filename extension, leaving the root name.</td>
+      </tr>
+      <tr>
+      <td><code>s/l/r[/]</code></td>
+      <td>Substitute <code>r</code> for the first match of <code>l</code>; <code>gs/l/r</code> or <code>s/l/r/:G</code> substitutes globally.</td>
+      </tr>
+      <tr>
+      <td><code>&amp;</code></td>
+      <td>Repeat the previous <code>s</code> substitution (may be preceded by <code>g</code>).</td>
+      </tr>
+      <tr>
+      <td><code>t</code> <code>[digits]</code></td>
+      <td>Remove leading path components, leaving the tail (<code>basename</code>); with digits keep that many trailing components.</td>
+      </tr>
+      <tr>
+      <td><code>u</code></td>
+      <td>Convert to uppercase.</td>
+      </tr>
+      <tr>
+      <td><code>x</code></td>
+      <td>Like <code>q</code>, but break into words at whitespace (not for parameter expansion).</td>
+      </tr>
+      <tr>
+      <td><code>f</code></td>
+      <td>Repeat the immediately following modifier until the word stops changing (parameter expansion / filename generation).</td>
+      </tr>
+      <tr>
+      <td><code>F:expr:</code></td>
+      <td>Like <code>f</code> but at most <code>expr</code> times.</td>
+      </tr>
+      <tr>
+      <td><code>w</code></td>
+      <td>Apply the immediately following modifier to each word of the string.</td>
+      </tr>
+      <tr>
+      <td><code>W:sep:</code></td>
+      <td>Like <code>w</code> but with <code>sep</code> as the word separator.</td>
+      </tr>
+      </tbody>
+      </table>
+      <p><strong>Substitution details:</strong> any character can be the delimiter in <code>s/l/r/</code> (a backslash quotes it). In <code>r</code>, <code>&amp;</code> is replaced by the matched <code>l</code> text (quote with <code>\</code>). A null <code>l</code> reuses the previous <code>l</code> or the <code>?str</code> scan string. The rightmost delimiter may be omitted if a newline follows. With <code>HIST_SUBST_PATTERN</code> set, <code>l</code> is a pattern (as in Appendix E): <code>#</code> anchors the match to the start and <code>%</code> to the end.</p>
+      <div class="sourceCode" id="cb189"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb189-1"><a href="#cb189-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /a/b/c</span>
+<span id="cb189-2"><a href="#cb189-2" aria-hidden="true" tabindex="-1"></a><span class="ex">!!:h</span>        <span class="co"># -&gt; ls /a/b   (drop last path component)</span></span>
+<span id="cb189-3"><a href="#cb189-3" aria-hidden="true" tabindex="-1"></a><span class="ex">!ls:s/c/d/</span>  <span class="co"># re-run most recent ls, replacing c with d</span></span></code></pre></div>
+      <h2 id="h.-multios-commandless-redirections-from-zshmisc1">H. MULTIOS &amp; Commandless Redirections — from zshmisc(1)</h2>
+      <h3 id="multios">MULTIOS</h3>
+      <p>If the <code>MULTIOS</code> option is set (the default) and a file descriptor is opened for writing more than once, the shell attaches it to a process that copies its input to all the outputs, like <code>tee</code>:</p>
+      <div class="sourceCode" id="cb190"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb190-1"><a href="#cb190-1" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span> <span class="op">&gt;</span>foo <span class="op">&gt;</span>bar     <span class="co"># writes the date to both foo and bar</span></span>
+<span id="cb190-2"><a href="#cb190-2" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span> <span class="op">&gt;</span>foo <span class="kw">|</span> <span class="fu">cat</span>    <span class="co"># a pipe is an implicit redirection: writes foo AND pipes to cat</span></span></code></pre></div>
+      <p>All target files are opened immediately, not when about to be written, and redirections are always evaluated in order. That ordering interacts with MULTIOS: <code>date &gt;&amp;1 &gt;output</code> duplicates the original stdout (tee-like), whereas <code>date &gt;output &gt;&amp;1</code> sends a second copy into <code>output</code> because <code>&gt;&amp;1</code> is evaluated after stdout was already redirected there.</p>
+      <p>With MULTIOS set, the word after a redirection also undergoes filename generation:</p>
+      <div class="sourceCode" id="cb191"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true" tabindex="-1"></a><span class="bu">:</span> <span class="op">&gt;</span> <span class="pp">*</span>              <span class="co"># truncate all files in the directory (not create a file named *)</span></span>
+<span id="cb191-2"><a href="#cb191-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> exit 0 <span class="op">&gt;&gt;</span> <span class="pp">*</span>.sh</span></code></pre></div>
+      <p>Opening a descriptor for reading more than once turns it into a process that concatenates all the inputs in order (each opened immediately, unlike <code>cat</code>):</p>
+      <div class="sourceCode" id="cb192"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb192-1"><a href="#cb192-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span> <span class="op">&lt;</span>foo <span class="op">&lt;</span>fubar   <span class="co"># equivalent to: cat foo fubar | sort</span></span>
+<span id="cb192-2"><a href="#cb192-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span> <span class="op">&lt;</span>f<span class="dt">{</span>oo<span class="op">,</span>ubar<span class="dt">}</span>   <span class="co"># same thing</span></span>
+<span id="cb192-3"><a href="#cb192-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> bar <span class="kw">|</span> <span class="fu">sort</span> <span class="op">&lt;</span>foo  <span class="co"># equivalent to: cat bar foo | sort</span></span></code></pre></div>
+      <p>If MULTIOS is <strong>unset</strong>, each redirection replaces the previous one for that descriptor, though all files are still opened; <code>echo Hello &gt; bar &gt; baz</code> truncates <code>bar</code> and writes <code>Hello</code> into <code>baz</code>.</p>
+      <p><strong>Caveat:</strong> an output multio attached to an external program may exit before the copies finish writing, because the tee-process is spawned after the command is forked. Run the writer as a current-shell job to force a wait:</p>
+      <div class="sourceCode" id="cb193"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb193-1"><a href="#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="fu">cat</span> file <span class="kw">}</span> <span class="op">&gt;</span>file1 <span class="op">&gt;</span>file2   <span class="co"># the {...} job waits for both files to be written</span></span></code></pre></div>
+      <h3 id="redirections-with-no-command">Redirections With No Command</h3>
+      <p>When a simple command has redirections (and optional assignments) but no command name, behaviour depends on options and parameters:</p>
+      <ul>
+      <li>If <code>NULLCMD</code> is unset or <code>CSH_NULLCMD</code> is set → an error (csh behaviour; <code>CSH_NULLCMD</code> is the csh-emulation default).</li>
+      <li>If <code>SH_NULLCMD</code> is set → the builtin <code>:</code> is inserted (the sh/ksh-emulation default), e.g. <code>&gt; file</code> truncates/creates the file.</li>
+      <li>Otherwise <code>NULLCMD</code> is used as the command; for an input redirection <code>READNULLCMD</code> is used instead if set. Defaults are <code>NULLCMD=cat</code> and <code>READNULLCMD=more</code>, so <code>&lt; file</code> pages the file:</li>
+      </ul>
+      <div class="sourceCode" id="cb194"><pre class="sourceCode zsh"><code class="sourceCode zsh"><span id="cb194-1"><a href="#cb194-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span> file             <span class="co"># shows the contents of file, paged if stdout is a terminal</span></span></code></pre></div>
+      <p><code>NULLCMD</code> and <code>READNULLCMD</code> may name shell functions.</p>
     </article>
 
     <footer class="doc-footer">
