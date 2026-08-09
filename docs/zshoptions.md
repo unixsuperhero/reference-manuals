@@ -1,5 +1,7 @@
 ---
 title: Zsh Options Reference
+template: zsh-options
+zsh_options_picker: true
 tags:
   - manpage
   - zsh

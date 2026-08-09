@@ -18,12 +18,24 @@ esac
 relative=${input#"$repo_dir/docs/"}
 output="$repo_dir/export/${relative%.md}.html"
 title=$("$repo_dir/bin/catalog" title "$input")
+template=$("$repo_dir/bin/catalog" template "$input")
+case "$template" in
+  (*[!A-Za-z0-9_-]*|'')
+    echo "export-doc: invalid template name in $relative: $template" >&2
+    exit 2
+    ;;
+esac
+template_path="$repo_dir/templates/$template.html"
+if [[ ! -f "$template_path" ]]; then
+  echo "export-doc: template not found: $template_path" >&2
+  exit 2
+fi
 mkdir -p "$(dirname "$output")"
 root_prefix=$(python3 -c 'import os, sys; print(os.path.relpath(sys.argv[1], sys.argv[2]) + "/")' "$repo_dir" "$(dirname "$output")")
 
 pandoc "$input" \
   --from=markdown \
-  --template="$repo_dir/templates/claude-docs.html" \
+  --template="$template_path" \
   --lua-filter="$repo_dir/bin/rewrite-md-links.lua" \
   --syntax-highlighting=breezedark \
   --metadata "title=$title" \

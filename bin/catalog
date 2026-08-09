@@ -121,17 +121,21 @@ def validate_index(repo: Path, data: dict[str, object]) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("catalog", "title", "validate"))
+    parser.add_argument("command", choices=("catalog", "template", "title", "validate"))
     parser.add_argument("path", nargs="?", type=Path)
     args = parser.parse_args()
     repo = Path(__file__).resolve().parent.parent
 
     try:
-        if args.command == "title":
+        if args.command in {"template", "title"}:
             if args.path is None:
-                parser.error("title requires a Markdown path")
+                parser.error(f"{args.command} requires a Markdown path")
             path = args.path.resolve()
-            print(title_for(path, metadata(path)))
+            meta = metadata(path)
+            if args.command == "template":
+                print(meta.get("template", "claude-docs"))
+            else:
+                print(title_for(path, meta))
             return 0
 
         data = build_catalog(repo)
