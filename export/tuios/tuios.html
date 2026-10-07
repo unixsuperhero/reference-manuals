@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="pandoc">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="What tuios is, how to install it, the mental model behind sessions, workspaces, windows and panes, a first session, and a map of the rest of this manual.">
+  <title>TUIOS: Start Here</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ════════════════════════════════════════════════════════════
+       TUIOS manual template: a three-column "book" layout.
+       left  = chapter list (shared partial)   center = chapter
+       right = on-this-page outline            keys: / [ ] t ?
+       ════════════════════════════════════════════════════════════ */
+    :root {
+      --font-body: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+      --nav-w: 248px;
+      --toc-w: 236px;
+      --content-w: 86ch;
+      --radius: 10px;
+
+      /* light: warm paper */
+      --bg:        #f7f4ee;
+      --bg2:       #efeae1;
+      --panel:     #fffdf9;
+      --line:      #ddd5c7;
+      --line2:     #c9bfae;
+      --text:      #1d1a16;
+      --text2:     #4f4840;
+      --text3:     #857b6e;
+      --accent:    #7a3fd6;
+      --accent2:   #5b2bb0;
+      --accent-bg: rgba(122,63,214,0.10);
+      --green:     #1f8a4c;
+      --amber:     #b4690e;
+      --red:       #c0392b;
+      --blue:      #1d63c7;
+      /* terminal surfaces stay dark in both themes */
+      --term-bg:   #16131d;
+      --term-bg2:  #1f1a2a;
+      --term-line: #332b45;
+      --term-text: #ece6f6;
+      --term-dim:  #9a8fb3;
+      --kbd-bg:    #fffdf9;
+      --kbd-line:  #c9bfae;
+      --kbd-shadow:#b4a995;
+    }
+    :root[data-theme="dark"] { color-scheme: dark; }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"],
+    :root[data-theme="auto"].dark-auto {
+      --bg:        #100e15;
+      --bg2:       #17141f;
+      --panel:     #1a1723;
+      --line:      #2b2638;
+      --line2:     #3b3450;
+      --text:      #ebe6f5;
+      --text2:     #bbb2cc;
+      --text3:     #7f7596;
+      --accent:    #b48cff;
+      --accent2:   #cdb0ff;
+      --accent-bg: rgba(180,140,255,0.14);
+      --green:     #5fd38a;
+      --amber:     #f0b24a;
+      --red:       #ff6b5c;
+      --blue:      #6fa8ff;
+      --kbd-bg:    #221d2e;
+      --kbd-line:  #3b3450;
+      --kbd-shadow:#0c0a10;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1.02rem;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    a { color: var(--accent); }
+    a:hover { color: var(--accent2); }
+
+    /* ── Top bar ─────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; gap: 1rem;
+      height: 52px; padding: 0 1rem;
+      background: color-mix(in srgb, var(--bg) 86%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: flex; align-items: center; gap: 0.55rem;
+      font-family: var(--font-mono); font-weight: 600; font-size: 0.86rem;
+      color: var(--text); text-decoration: none; letter-spacing: 0.02em;
+    }
+    .brand .dot {
+      width: 10px; height: 10px; border-radius: 3px;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+    .brand .manual { color: var(--text3); font-weight: 400; }
+    .topbar .spacer { flex: 1; }
+    .search-wrap { position: relative; width: min(360px, 40vw); }
+    .search-wrap input {
+      width: 100%; height: 34px; padding: 0 2.4rem 0 0.8rem;
+      border: 1px solid var(--line2); border-radius: 8px;
+      background: var(--panel); color: var(--text);
+      font: 0.86rem var(--font-body);
+    }
+    .search-wrap input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .search-wrap kbd.hint {
+      position: absolute; right: 0.45rem; top: 50%; transform: translateY(-50%);
+      font-size: 0.66rem; padding: 0 0.4rem; pointer-events: none;
+    }
+    .search-results {
+      position: absolute; top: 38px; left: 0; right: 0; max-height: 60vh; overflow: auto;
+      background: var(--panel); border: 1px solid var(--line2); border-radius: 8px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.22); display: none; z-index: 60;
+    }
+    .search-results.open { display: block; }
+    .search-results a {
+      display: block; padding: 0.5rem 0.8rem; text-decoration: none; color: var(--text);
+      font-size: 0.86rem; border-bottom: 1px solid var(--line);
+    }
+    .search-results a small { display: block; color: var(--text3); font-family: var(--font-mono); font-size: 0.68rem; }
+    .search-results a:hover, .search-results a.active { background: var(--accent-bg); }
+    .search-results .none { padding: 0.6rem 0.8rem; color: var(--text3); font-size: 0.82rem; }
+    .iconbtn {
+      appearance: none; border: 1px solid var(--line2); background: var(--panel); color: var(--text2);
+      height: 34px; min-width: 34px; padding: 0 0.55rem; border-radius: 8px; cursor: pointer;
+      font: 500 0.8rem var(--font-mono);
+    }
+    .iconbtn:hover { color: var(--accent2); border-color: var(--accent); }
+    .all-docs { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text3); text-decoration: none; }
+    .all-docs:hover { color: var(--accent2); }
+
+    /* ── Shell ───────────────────────────────── */
+    .shell {
+      display: grid;
+      grid-template-columns: var(--nav-w) minmax(0, 1fr) var(--toc-w);
+      gap: 0; min-height: calc(100vh - 52px);
+    }
+    .book-side, .page-side {
+      position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto;
+      padding: 1.4rem 1rem 2rem;
+      scrollbar-width: thin; scrollbar-color: var(--line2) transparent;
+    }
+    .book-side { border-right: 1px solid var(--line); background: var(--bg2); }
+    .page-side { border-left: 1px solid var(--line); }
+    .side-label {
+      font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text3); margin: 0 0 0.7rem 0.5rem;
+    }
+
+    /* ── Book nav (left) ─────────────────────── */
+    .book-chapters { list-style: none; }
+    .book-chapters li a {
+      display: grid; grid-template-columns: 2.2rem 1fr; align-items: baseline;
+      padding: 0.42rem 0.5rem; border-radius: 7px; text-decoration: none;
+      color: var(--text2); font-size: 0.86rem; line-height: 1.3;
+    }
+    .book-chapters li a .num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text3); }
+    .book-chapters li a:hover { background: var(--panel); color: var(--text); }
+    .book-chapters li.current a { background: var(--accent-bg); color: var(--text); font-weight: 600; }
+    .book-chapters li.current a .num { color: var(--accent); }
+    .book-chapters li.howto a .label::after {
+      content: 'how to'; margin-left: 0.4rem; font: 600 0.58rem var(--font-mono);
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--green);
+      border: 1px solid var(--green); border-radius: 4px; padding: 0 0.3rem; vertical-align: middle;
+    }
+    .book-chapters li.hidden { display: none; }
+    .keys-help {
+      margin-top: 1.6rem; padding: 0.8rem; border: 1px dashed var(--line2); border-radius: 8px;
+      font-size: 0.74rem; color: var(--text3); line-height: 1.9;
+    }
+    .keys-help kbd { font-size: 0.66rem; }
+
+    /* ── Page outline (right) ────────────────── */
+    .page-side nav ul { list-style: none; }
+    .page-side nav li { margin: 0; }
+    .page-side nav a {
+      display: block; padding: 0.26rem 0.55rem; border-left: 2px solid transparent;
+      color: var(--text3); text-decoration: none; font-size: 0.78rem; line-height: 1.35;
+    }
+    .page-side nav a:hover { color: var(--text); }
+    .page-side nav a.active { color: var(--accent2); border-left-color: var(--accent); background: var(--accent-bg); }
+    .page-side nav ul ul { padding-left: 0.7rem; }
+    .page-side nav ul ul a { font-size: 0.72rem; }
+    .page-side nav ul ul ul { display: none; }
+    .page-side nav li.hidden { display: none; }
+    .progress { height: 3px; background: var(--line); border-radius: 2px; margin: 0 0.5rem 1rem; overflow: hidden; }
+    .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--blue)); }
+
+    /* ── Article ─────────────────────────────── */
+    .content { padding: 2.6rem 3rem 6rem; display: flex; flex-direction: column; align-items: center; }
+    article, .chapter-head, .chapter-foot { width: 100%; max-width: var(--content-w); }
+    .chapter-head { margin-bottom: 2.4rem; animation: rise 0.35s ease-out both; }
+    .chapter-kicker {
+      display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text3); margin-bottom: 0.9rem;
+    }
+    .chapter-kicker .chip {
+      padding: 0.1rem 0.5rem; border: 1px solid var(--accent); border-radius: 999px;
+      color: var(--accent); letter-spacing: 0.1em;
+    }
+    .chapter-head h1 {
+      font-size: clamp(1.9rem, 4vw, 2.7rem); line-height: 1.12; letter-spacing: -0.025em;
+      font-weight: 800; color: var(--text);
+    }
+    .chapter-head h1 .prefix { color: var(--text3); font-weight: 500; }
+    .chapter-summary { margin-top: 0.9rem; font-size: 1.08rem; color: var(--text2); max-width: 70ch; }
+    .tag-row { margin-top: 1rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .tag-row span {
+      font: 500 0.66rem var(--font-mono); color: var(--text3); background: var(--bg2);
+      border: 1px solid var(--line); border-radius: 5px; padding: 0.1rem 0.45rem;
+    }
+
+    article h2 {
+      font-size: 1.55rem; font-weight: 700; letter-spacing: -0.015em; line-height: 1.25;
+      margin: 3.2rem 0 1rem; padding-top: 1.4rem; border-top: 1px solid var(--line);
+      scroll-margin-top: 72px; position: relative;
+    }
+    article h2::before {
+      content: '§'; position: absolute; left: -1.6rem; top: 1.45rem;
+      font-family: var(--font-mono); font-weight: 400; color: var(--line2); font-size: 1.1rem;
+    }
+    article h3 { font-size: 1.18rem; font-weight: 650; margin: 2.2rem 0 0.7rem; scroll-margin-top: 72px; }
+    article h4 { font-size: 0.98rem; font-weight: 650; margin: 1.6rem 0 0.5rem; color: var(--text2); scroll-margin-top: 72px; }
+    article h5, article h6 { font-size: 0.9rem; margin: 1.2rem 0 0.4rem; color: var(--text2); }
+    article h2 a.anchor, article h3 a.anchor, article h4 a.anchor {
+      opacity: 0; margin-left: 0.4rem; font-weight: 400; color: var(--text3); text-decoration: none; font-family: var(--font-mono);
+    }
+    article h2:hover a.anchor, article h3:hover a.anchor, article h4:hover a.anchor { opacity: 1; }
+    article p { margin-bottom: 1.1rem; color: var(--text); }
+    article p, article li { max-width: 78ch; }
+    article ul, article ol { margin: 0 0 1.2rem 1.4rem; }
+    article li { margin-bottom: 0.3rem; }
+    article li > ul, article li > ol { margin-top: 0.3rem; margin-bottom: 0.4rem; }
+    article strong { font-weight: 650; }
+    article hr { border: 0; border-top: 1px solid var(--line); margin: 2.4rem 0; }
+    article blockquote {
+      margin: 1.2rem 0; padding: 0.6rem 1rem; border-left: 3px solid var(--line2);
+      color: var(--text2); background: var(--bg2); border-radius: 0 8px 8px 0;
+    }
+
+    /* inline code, kbd */
+    article code {
+      font-family: var(--font-mono); font-size: 0.86em;
+      background: var(--bg2); border: 1px solid var(--line); border-radius: 5px; padding: 0.08em 0.38em;
+      color: var(--text);
+    }
+    article a code { color: var(--accent); }
+    kbd {
+      display: inline-block; font-family: var(--font-mono); font-size: 0.76em; line-height: 1.5;
+      padding: 0 0.42em; border-radius: 5px; vertical-align: baseline;
+      background: var(--kbd-bg); border: 1px solid var(--kbd-line);
+      box-shadow: inset 0 -2px 0 var(--kbd-shadow); color: var(--text);
+      white-space: nowrap;
+    }
+    kbd + kbd { margin-left: 0.15em; }
+
+    /* code blocks, always terminal-dark */
+    article pre {
+      position: relative; margin: 0 0 1.4rem; padding: 1rem 6.5rem 1rem 1.1rem;
+      background: var(--term-bg); border: 1px solid var(--term-line); border-radius: var(--radius);
+      overflow-x: auto; font-family: var(--font-mono); font-size: 0.84rem; line-height: 1.6;
+      color: var(--term-text); tab-size: 4;
+    }
+    article pre code { background: transparent; border: 0; padding: 0; font-size: inherit; color: inherit; }
+    article div.sourceCode { margin: 0 0 1.4rem; position: relative; }
+    article div.sourceCode pre { margin: 0; }
+    .code-tools {
+      position: absolute; top: 0.45rem; right: 0.5rem; display: flex; gap: 0.35rem; align-items: center; z-index: 2;
+    }
+    .code-lang {
+      font: 500 0.62rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--term-dim); padding: 0.15rem 0.45rem; border: 1px solid var(--term-line); border-radius: 5px;
+    }
+    .copy-btn {
+      appearance: none; cursor: pointer; font: 500 0.62rem var(--font-mono); letter-spacing: 0.08em;
+      color: var(--term-dim); background: var(--term-bg2); border: 1px solid var(--term-line); border-radius: 5px;
+      padding: 0.15rem 0.5rem; opacity: 0; transition: opacity 0.15s, color 0.15s;
+    }
+    article pre:hover .copy-btn, article div.sourceCode:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+    .copy-btn:hover { color: var(--term-text); }
+    .copy-btn.done { color: #5fd38a; border-color: #5fd38a; opacity: 1; }
+
+    /* tables */
+    article table {
+      width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0 0 1.6rem;
+      border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+      background: var(--panel);
+    }
+    article thead th {
+      text-align: left; padding: 0.55rem 0.75rem; font-family: var(--font-mono); font-weight: 600;
+      font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3);
+      background: var(--bg2); border-bottom: 1px solid var(--line2);
+    }
+    article td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    article tbody tr:last-child td { border-bottom: 0; }
+    article tbody tr:hover td { background: var(--accent-bg); }
+    article td code { white-space: nowrap; }
+    .table-wrap { overflow-x: auto; margin-bottom: 1.6rem; }
+    .table-wrap table { margin-bottom: 0; }
+
+    /* ── Callouts (pandoc fenced divs) ───────── */
+    article .note, article .tip, article .warning, article .example, article .default, article .howto {
+      margin: 1.4rem 0; padding: 0.9rem 1.1rem 0.6rem; border-radius: var(--radius);
+      border: 1px solid var(--line); border-left-width: 4px; background: var(--panel);
+    }
+    article .note::before, article .tip::before, article .warning::before, article .example::before, article .default::before {
+      display: block; font: 600 0.64rem var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 0.4rem;
+    }
+    article .note    { border-left-color: var(--blue); }  article .note::before    { content: 'Note'; color: var(--blue); }
+    article .tip     { border-left-color: var(--green); } article .tip::before     { content: 'Tip'; color: var(--green); }
+    article .warning { border-left-color: var(--red); }   article .warning::before { content: 'Warning'; color: var(--red); }
+    article .example { border-left-color: var(--accent); }article .example::before { content: 'Example'; color: var(--accent); }
+    article .default { border-left-color: var(--amber); } article .default::before { content: 'Default'; color: var(--amber); }
+    article .note p:last-child, article .tip p:last-child, article .warning p:last-child,
+    article .example p:last-child, article .default p:last-child { margin-bottom: 0.4rem; }
+
+    /* ── How-to steps ────────────────────────── */
+    article .howto { border-left-color: var(--green); padding: 1rem 1.2rem 0.4rem; counter-reset: step; }
+    article .howto > ol { list-style: none; margin-left: 0; }
+    article .howto > ol > li {
+      position: relative; padding-left: 2.6rem; margin-bottom: 1.1rem; counter-increment: step;
+    }
+    article .howto > ol > li::before {
+      content: counter(step); position: absolute; left: 0; top: 0.1rem;
+      width: 1.8rem; height: 1.8rem; border-radius: 50%; display: grid; place-items: center;
+      background: var(--green); color: #fff; font: 700 0.8rem var(--font-mono);
+    }
+    article .howto > ol > li > p:first-child { font-weight: 600; margin-bottom: 0.4rem; }
+
+    /* ── Chapter footer ──────────────────────── */
+    .chapter-foot {
+      margin-top: 4rem; padding-top: 1.4rem; border-top: 1px solid var(--line);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    .chapter-foot a {
+      display: block; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: var(--radius);
+      text-decoration: none; color: var(--text); background: var(--panel);
+    }
+    .chapter-foot a:hover { border-color: var(--accent); }
+    .chapter-foot a small { display: block; font: 500 0.62rem var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.25rem; }
+    .chapter-foot a.next { text-align: right; }
+    .chapter-foot a.empty { visibility: hidden; }
+    .colophon {
+      width: 100%; max-width: var(--content-w); margin-top: 1.6rem;
+      font: 0.66rem var(--font-mono); color: var(--text3); display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .colophon a { color: var(--text3); text-decoration: none; }
+    .colophon a:hover { color: var(--accent2); }
+
+    /* ── Syntax highlighting (pandoc) ────────── */
+        html { -webkit-text-size-adjust: 100%; }
+        pre > code.sourceCode { white-space: pre; position: relative; }
+        pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+        pre > code.sourceCode > span:empty { height: 1.2em; }
+        .sourceCode { overflow: visible; }
+        code.sourceCode > span { color: inherit; text-decoration: inherit; }
+        div.sourceCode { margin: 1em 0; }
+        pre.sourceCode { margin: 0; }
+        @media screen {
+        div.sourceCode { overflow: auto; }
+        }
+        @media print {
+        pre > code.sourceCode { white-space: pre-wrap; }
+        pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+        }
+        pre.numberSource code
+          { counter-reset: source-line 0; }
+        pre.numberSource code > span
+          { position: relative; left: -4em; counter-increment: source-line; }
+        pre.numberSource code > span > a:first-child::before
+          { content: counter(source-line);
+            position: relative; left: -1em; text-align: right; vertical-align: baseline;
+            border: none; display: inline-block;
+            -webkit-touch-callout: none; -webkit-user-select: none;
+            -khtml-user-select: none; -moz-user-select: none;
+            -ms-user-select: none; user-select: none;
+            padding: 0 4px; width: 4em;
+            background-color: #232629;
+            color: #7a7c7d;
+          }
+        pre.numberSource { margin-left: 3em; border-left: 1px solid #7a7c7d;  padding-left: 4px; }
+        div.sourceCode
+          { color: #cfcfc2; background-color: #232629; }
+        @media screen {
+        pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+        }
+        code span { color: #cfcfc2; } /* Normal */
+        code span.al { color: #95da4c; background-color: #4d1f24; font-weight: bold; } /* Alert */
+        code span.an { color: #3f8058; } /* Annotation */
+        code span.at { color: #2980b9; } /* Attribute */
+        code span.bn { color: #f67400; } /* BaseN */
+        code span.bu { color: #7f8c8d; } /* BuiltIn */
+        code span.cf { color: #fdbc4b; font-weight: bold; } /* ControlFlow */
+        code span.ch { color: #3daee9; } /* Char */
+        code span.cn { color: #27aeae; font-weight: bold; } /* Constant */
+        code span.co { color: #7a7c7d; } /* Comment */
+        code span.cv { color: #7f8c8d; } /* CommentVar */
+        code span.do { color: #a43340; } /* Documentation */
+        code span.dt { color: #2980b9; } /* DataType */
+        code span.dv { color: #f67400; } /* DecVal */
+        code span.er { color: #da4453; text-decoration: underline; } /* Error */
+        code span.ex { color: #0099ff; font-weight: bold; } /* Extension */
+        code span.fl { color: #f67400; } /* Float */
+        code span.fu { color: #8e44ad; } /* Function */
+        code span.im { color: #27ae60; } /* Import */
+        code span.in { color: #c45b00; } /* Information */
+        code span.kw { color: #cfcfc2; font-weight: bold; } /* Keyword */
+        code span.op { color: #cfcfc2; } /* Operator */
+        code span.ot { color: #27ae60; } /* Other */
+        code span.pp { color: #27ae60; } /* Preprocessor */
+        code span.re { color: #2980b9; background-color: #153042; } /* RegionMarker */
+        code span.sc { color: #3daee9; } /* SpecialChar */
+        code span.ss { color: #da4453; } /* SpecialString */
+        code span.st { color: #f44f4f; } /* String */
+        code span.va { color: #27aeae; } /* Variable */
+        code span.vs { color: #da4453; } /* VerbatimString */
+        code span.wa { color: #da4453; } /* Warning */
+        pre.sourceCode, div.sourceCode pre, pre > code.sourceCode { background: var(--term-bg) !important; }
+    code span.kw { color: #c792ea; } code span.cf { color: #c792ea; }
+    code span.dt { color: #82aaff; } code span.dv, code span.fl, code span.bn { color: #f78c6c; }
+    code span.co, code span.do { color: #7e7a94; font-style: italic; }
+    code span.st, code span.ss, code span.vs { color: #c3e88d; }
+    code span.op { color: #89ddff; } code span.fu { color: #82aaff; }
+    code span.va { color: #f07178; } code span.at { color: #ffcb6b; }
+    code span.an, code span.wa { color: #f0b24a; } code span.er { color: #ff5370; }
+    code span.ex, code span.bu { color: #ffcb6b; } code span.ot { color: #89ddff; }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 4px; }
+
+    @media (max-width: 1180px) {
+      .shell { grid-template-columns: var(--nav-w) minmax(0, 1fr); }
+      .page-side { display: none; }
+    }
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: minmax(0, 1fr); }
+      .book-side { display: none; }
+      .content { padding: 1.6rem 1.1rem 4rem; }
+      article h2::before { display: none; }
+      .search-wrap { width: 46vw; }
+      .all-docs { display: none; }
+    }
+    @media print {
+      .topbar, .book-side, .page-side, .chapter-foot, .code-tools { display: none !important; }
+      .shell { display: block; }
+      body { background: #fff; color: #000; }
+      article pre { background: #f4f4f4; color: #000; border-color: #ccc; }
+      article a { color: inherit; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="tuios.html"><span class="dot"></span>tuios <span class="manual">/ manual</span></a>
+    <div class="spacer"></div>
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="Jump to a section…" autocomplete="off" aria-label="Search sections of this chapter">
+      <kbd class="hint">/</kbd>
+      <div id="search-results" class="search-results" role="listbox"></div>
+    </div>
+    <button id="theme-btn" class="iconbtn" title="Theme (t)">auto</button>
+    <a class="all-docs" href="../../index.html">← all docs</a>
+  </header>
+
+  <div class="shell">
+    <aside class="book-side">
+      <div class="side-label">Chapters</div>
+      <nav class="book-nav" aria-label="Manual chapters">
+        <ol class="book-chapters">
+          <li data-chapter="1"><a href="tuios.html"><span class="num">01</span><span class="label">Start Here</span></a></li>
+          <li data-chapter="2"><a href="concepts.html"><span class="num">02</span><span class="label">Core Concepts &amp; the Screen</span></a></li>
+          <li data-chapter="3"><a href="keybindings.html"><span class="num">03</span><span class="label">Keybindings &amp; Palette</span></a></li>
+          <li data-chapter="4"><a href="configuration.html"><span class="num">04</span><span class="label">Configuration, Themes, Hooks</span></a></li>
+          <li data-chapter="5"><a href="sessions.html"><span class="num">05</span><span class="label">Daemon, Sessions, Hosts</span></a></li>
+          <li data-chapter="6"><a href="agents.html"><span class="num">06</span><span class="label">Agents, Inbox, Mail, MCP</span></a></li>
+          <li data-chapter="7"><a href="cli.html"><span class="num">07</span><span class="label">CLI &amp; Protocol Reference</span></a></li>
+          <li data-chapter="8"><a href="automation.html"><span class="num">08</span><span class="label">Tapes &amp; Scripted Workflows</span></a></li>
+          <li data-chapter="9" class="howto"><a href="howto-extending.html"><span class="num">09</span><span class="label">How To: Extend tuios</span></a></li>
+          <li data-chapter="10"><a href="ecosystem.html"><span class="num">10</span><span class="label">Ecosystem &amp; Plugin Directory</span></a></li>
+        </ol>
+      </nav>      <div class="keys-help">
+        <kbd>/</kbd> search &nbsp; <kbd>[</kbd> <kbd>]</kbd> prev / next chapter<br>
+        <kbd>t</kbd> theme &nbsp; <kbd>Esc</kbd> close search
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="chapter-head">
+        <div class="chapter-kicker">
+          <span class="chip">Chapter 1</span>
+          <span>tuios manual</span>
+
+        </div>
+        <h1 id="chapter-title">TUIOS: Start Here</h1>
+        <p class="chapter-summary">What tuios is, how to install it, the mental model behind sessions, workspaces, windows and panes, a first session, and a map of the rest of this manual.</p>
+        <div class="tag-row"><span>tuios</span><span>terminal</span><span>multiplexer</span><span>manual</span></div>
+      </div>
+
+      <article>
+<p>tuios (Terminal UI Operating System) is a terminal window manager and multiplexer written in Go. It runs inside the terminal you already use, tiles or floats any number of terminal panes across nine workspaces, keeps those panes alive in a daemon so they survive the window they started in, and understands the coding agents that run inside them. This manual documents tuios <strong>v0.8.5</strong> as installed by Homebrew on macOS in October 2026, from the project’s own source tree and the output of the binary itself.</p>
+<p>This chapter is the orientation. It installs tuios, explains the handful of objects every other chapter refers to, walks through a first session, and tells you where each topic lives in the manual.</p>
+<h2 id="what-tuios-is-in-one-screen">What tuios is, in one screen</h2>
+<p>Think of tuios as three things stacked on top of each other:</p>
+<pre class="text"><code>┌──────────────────────────────────────────────────────────────────┐
+│  CLIENT      the `tuios` TUI drawn in your terminal              │
+│              modes, keybindings, palette, dock, rail, overlays   │
+├──────────────────────────────────────────────────────────────────┤
+│  DAEMON      `tuios daemon`, one per user, on a unix socket      │
+│              owns every session, window and pty; survives you    │
+│              detaching; reaches other machines over ssh          │
+├──────────────────────────────────────────────────────────────────┤
+│  VERBS       the JSON protocol every `tuios &lt;command&gt;` speaks    │
+│              from a shell, a script, an agent, an MCP client,    │
+│              a tmux-only tool through the shim, or herdr clients │
+└──────────────────────────────────────────────────────────────────┘</code></pre>
+<ul>
+<li>The <strong>client</strong> is what you look at. It is a Bubble Tea v2 application with a vim-like modal interface: a window-management mode for arranging panes and a terminal mode for typing into one.</li>
+<li>The <strong>daemon</strong> is what keeps state. A session lives there, not in your terminal window, so closing the window, losing an ssh link or rebooting (with resurrection) does not lose the session.</li>
+<li>The <strong>verbs</strong> are how everything else talks to the daemon. Every subcommand of <code>tuios</code>, the agent skill, the MCP server, the tmux shim and the herdr adapter are all thin clients of the same protocol.</li>
+</ul>
+<div class="note">
+<p>The project calls itself TUIOS, tuios and “Terminal UI Operating System”. The binary and the daemon are both <code>tuios</code>. The web front end is a separate binary, <code>tuios-web</code>, kept apart for security isolation.</p>
+</div>
+<h2 id="installing">Installing</h2>
+<p>tuios is a single static binary. Pick one route:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Homebrew (macOS and Linux); this manual was written against this build</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install tuios</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Arch Linux</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">yay</span> <span class="at">-S</span> tuios-bin</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Nix: a release, the newest main, or the nixpkgs package</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">nix</span> run github:Gaurav-Gosain/tuios/v0.8.5#tuios</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">nix</span> run github:Gaurav-Gosain/tuios#tuios</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">nix</span> run nixpkgs#tuios</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Install script (Linux and macOS)</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-fsSL</span> https://raw.githubusercontent.com/Gaurav-Gosain/tuios/main/install.sh <span class="kw">|</span> <span class="fu">bash</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Go toolchain (needs Go 1.26.6 or newer)</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> install github.com/Gaurav-Gosain/tuios/cmd/tuios@latest</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Docker</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-it</span> <span class="at">--rm</span> ghcr.io/gaurav-gosain/tuios:latest</span></code></pre></div>
+<p>Pre-built binaries for Linux, macOS, Windows, FreeBSD and OpenBSD are on the <a href="https://github.com/Gaurav-Gosain/tuios/releases">GitHub releases page</a> with a <code>checksums.txt</code>. The <code>tuios-ghostty_*</code> archives are the same program built on the libghostty-vt terminal emulator instead of the pure-Go one.</p>
+<p>Check what you have:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tuios</span> <span class="at">--version</span></span></code></pre></div>
+<pre class="text"><code>tuios version 0.8.5 [pure-Go backend]
+Commit: Homebrew
+Built: 2026-10-02T05:38:20Z</code></pre>
+<div class="tip">
+<p><code>tuios update</code> fetches the newest release when you installed from the script or a release binary. When a package manager owns the binary, it detects that and prints the right command instead of overwriting the file.</p>
+</div>
+<p><strong>Requirements.</strong> A terminal with true colour. For images, a terminal that speaks the kitty graphics protocol or sixel (Ghostty, Kitty, WezTerm). A Nerd Font makes the chrome prettier; <code>--ascii-only</code> or a glyph set in the config removes the need for one (see <a href="configuration.html#glyph-sets">Configuration</a>).</p>
+<h2 id="the-mental-model">The mental model</h2>
+<p>Every chapter uses these words, in this exact sense.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Word</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Daemon</strong></td>
+<td>The background process that owns everything. One per user, addressed over a unix socket under <code>XDG_RUNTIME_DIR</code>.</td>
+</tr>
+<tr>
+<td><strong>Session</strong></td>
+<td>A named collection of workspaces, like a tmux session. <code>tuios new work</code>, <code>tuios attach work</code>, <code>tuios ls</code>. A session can be <em>global</em> and hold panes from several machines.</td>
+</tr>
+<tr>
+<td><strong>Workspace</strong></td>
+<td>One of nine numbered screens inside a session. Each has its own layout and its own set of windows.</td>
+</tr>
+<tr>
+<td><strong>Window</strong></td>
+<td>One rectangle on a workspace. It has an id (a uuid), an index, an optional name you gave it, and the title its program sets. It is either tiled or floating, and can be minimized or zoomed.</td>
+</tr>
+<tr>
+<td><strong>Pane</strong></td>
+<td>The terminal inside a window. One window owns exactly one pane, so the words are used interchangeably: <code>TUIOS_PANE_ID</code> and <code>TUIOS_WINDOW_ID</code> are the same uuid.</td>
+</tr>
+<tr>
+<td><strong>Focus</strong></td>
+<td>The window that receives keys. The daemon remembers the most recently active session too, which is what commands use when you omit <code>-s</code>.</td>
+</tr>
+<tr>
+<td><strong>Mode</strong></td>
+<td>Window-management mode (keys rearrange windows) or terminal mode (keys go to the program). Copy mode is a third, for scrollback.</td>
+</tr>
+<tr>
+<td><strong>Prefix</strong></td>
+<td>The chord leader, <kbd>Ctrl</kbd>+<kbd>b</kbd> by default. <kbd>Prefix</kbd> <kbd>d</kbd> means press the prefix, release, press d.</td>
+</tr>
+<tr>
+<td><strong>Dock</strong></td>
+<td>The bar along the bottom: workspace tabs, session buttons, agents, clock and your own components.</td>
+</tr>
+<tr>
+<td><strong>Rail</strong></td>
+<td>The sidebar on the right: sessions, terminals, files, git state and agents.</td>
+</tr>
+<tr>
+<td><strong>Agent</strong></td>
+<td>A coding assistant (Claude Code, Codex, Gemini CLI, opencode, …) running in a pane. tuios tracks its state and gives it a mailbox.</td>
+</tr>
+<tr>
+<td><strong>Verb</strong></td>
+<td>One request type in the daemon’s JSON protocol. <code>tuios list-verbs</code> prints them all.</td>
+</tr>
+</tbody>
+</table>
+<p>A picture of the same thing:</p>
+<pre class="text"><code>daemon
+└── session &quot;work&quot;            (tuios new work)
+    ├── workspace 1
+    │   ├── window 0  name &quot;editor&quot;   tiled      pane: nvim
+    │   ├── window 1  name &quot;server&quot;   tiled      pane: npm run dev
+    │   └── window 2  name &quot;scratch&quot;  floating   pane: zsh
+    ├── workspace 2
+    │   └── window 0  name &quot;claude&quot;   tiled      pane: claude   agent: working
+    └── workspace 3..9           (empty until you use them)</code></pre>
+<p>From inside any of those panes, the shell knows where it is:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;</span><span class="va">$TUIOS_ENV</span><span class="st"> </span><span class="va">$TUIOS_SESSION</span><span class="st"> </span><span class="va">$TUIOS_PANE_ID</span><span class="st">&quot;</span></span></code></pre></div>
+<pre class="text"><code>1 work 98db8226-1829-468e-89a8-41a2baa0ddab</code></pre>
+<p>That is the whole model. Sessions hold workspaces, workspaces hold windows, a window is a pane, and a verb can reach any of them by session name and window id, index or name.</p>
+<h2 id="a-first-session">A first session</h2>
+<p>Start tuios with no arguments:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tuios</span></span></code></pre></div>
+<p>It starts the daemon if none is running, creates or attaches a session, and draws one pane with your shell. You begin in <strong>window-management mode</strong>: the pane has a highlighted border and typing does not reach the shell yet.</p>
+<div class="howto">
+<ol type="1">
+<li><p><strong>Make a second pane.</strong> Press <kbd>n</kbd>. The screen splits; tuios tiles new panes by default using binary space partitioning.</p></li>
+<li><p><strong>Type into a pane.</strong> Press <kbd>i</kbd> or <kbd>Enter</kbd> to enter terminal mode. Run something, for example <code>htop</code>.</p></li>
+<li><p><strong>Get back out.</strong> Press <kbd>Prefix</kbd> <kbd>Esc</kbd> (that is <kbd>Ctrl</kbd>+<kbd>b</kbd>, then <kbd>Esc</kbd>) or <kbd>Alt</kbd>+<kbd>Esc</kbd>. A bare <kbd>Esc</kbd> goes to the program, as it should.</p></li>
+<li><p><strong>Move focus.</strong> In window-management mode, <kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd> move between panes like vim. <kbd>Tab</kbd> cycles.</p></li>
+<li><p><strong>Open the command palette.</strong> Press <kbd>Ctrl</kbd>+<kbd>p</kbd> from either mode. Type a few letters of any action (“zoom”, “layout”, “rename”) and press <kbd>Enter</kbd>. Everything in this manual that has a key also has a palette entry, so the palette is the way to discover keys.</p></li>
+<li><p><strong>Zoom and unzoom.</strong> Press <kbd>z</kbd> in window-management mode. The focused pane takes 95% of the screen; press again to restore.</p></li>
+<li><p><strong>Switch workspace.</strong> Press <kbd>2</kbd> for an empty workspace, make a pane there, press <kbd>1</kbd> to come back.</p></li>
+<li><p><strong>Detach.</strong> Press <kbd>Prefix</kbd> <kbd>d</kbd>. Your terminal is back to its own shell. The panes are still running in the daemon.</p></li>
+<li><p><strong>Reattach.</strong> Run <code>tuios ls</code> to see the session, then <code>tuios attach &lt;name&gt;</code> (or just <code>tuios</code>).</p></li>
+<li><p><strong>Quit for real.</strong> <kbd>Prefix</kbd> <kbd>q</kbd> quits the client. <code>tuios kill-session &lt;name&gt;</code> ends the session itself.</p></li>
+</ol>
+</div>
+<div class="tip">
+<p>Run <code>tuios --show-keys</code> once while learning. It draws every key you press in an overlay, which makes mode switching and chords visible. <kbd>Prefix</kbd> <kbd>?</kbd> opens the help overlay, and holding <kbd>Prefix</kbd> shows the which-key popup of available chords.</p>
+</div>
+<h3 id="the-keys-you-will-use-on-day-one">The keys you will use on day one</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Key</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><kbd>Ctrl</kbd>+<kbd>p</kbd></td>
+<td>Command palette: search and run any action</td>
+</tr>
+<tr>
+<td><kbd>Alt</kbd>+<kbd>Space</kbd></td>
+<td>Launcher: start any program on <code>$PATH</code></td>
+</tr>
+<tr>
+<td><kbd>n</kbd></td>
+<td>New pane (window-management mode)</td>
+</tr>
+<tr>
+<td><kbd>i</kbd> or <kbd>Enter</kbd></td>
+<td>Enter terminal mode</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>Esc</kbd> or <kbd>Alt</kbd>+<kbd>Esc</kbd></td>
+<td>Back to window-management mode</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>d</kbd></td>
+<td>Detach</td>
+</tr>
+<tr>
+<td><kbd>z</kbd> or <kbd>Prefix</kbd> <kbd>z</kbd></td>
+<td>Toggle pane zoom</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>Space</kbd></td>
+<td>Toggle BSP tiling</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>[</kbd></td>
+<td>Copy mode (vim scrollback)</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>S</kbd></td>
+<td>Session switcher</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>i</kbd></td>
+<td>The Inbox: everything your agents are waiting on</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>,</kbd></td>
+<td>Settings page</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>k</kbd></td>
+<td>Keybind manager</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>?</kbd></td>
+<td>Help overlay</td>
+</tr>
+<tr>
+<td><kbd>Prefix</kbd> <kbd>q</kbd></td>
+<td>Quit</td>
+</tr>
+</tbody>
+</table>
+<p>The full tables, per mode and per config section, are in <a href="keybindings.html">Keybindings</a>.</p>
+<h2 id="driving-it-from-a-shell">Driving it from a shell</h2>
+<p>Everything the keyboard can do, a command can do. Three commands cover most scripting:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># open a named window in this session without stealing focus</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tuios</span> new-window <span class="at">-s</span> <span class="st">&quot;</span><span class="va">$TUIOS_SESSION</span><span class="st">&quot;</span> build <span class="at">--cwd</span> ~/proj/app <span class="at">--no-focus</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># type a command into it and press Enter</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">tuios</span> send-text <span class="at">-s</span> <span class="st">&quot;</span><span class="va">$TUIOS_SESSION</span><span class="st">&quot;</span> <span class="at">-w</span> build <span class="st">&#39;make test&#39;</span> <span class="at">--enter</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># read back what it printed, bounded</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ex">tuios</span> capture-pane <span class="at">-s</span> <span class="st">&quot;</span><span class="va">$TUIOS_SESSION</span><span class="st">&quot;</span> <span class="at">-w</span> build <span class="at">--scrollback</span> <span class="at">--lines</span> 40</span></code></pre></div>
+<p>Inside a pane, always pass <code>-s "$TUIOS_SESSION"</code> and address yourself as <code>-w "$TUIOS_PANE_ID"</code>; the defaults follow focus, and focus moves under you. <a href="sessions.html">Sessions</a> has the addressing rules and the full pane toolkit, <a href="automation.html">Automation</a> builds whole workflows from them, and <a href="cli.html">CLI Reference</a> lists every command and flag.</p>
+<h2 id="agents-briefly">Agents, briefly</h2>
+<p>tuios is unusual among multiplexers in that it knows what the program in a pane is doing when that program is a coding agent. A pane running Claude Code, Codex, Gemini CLI, opencode or one of 24 detected CLIs shows a state (working, needs input, idle, done, errored) in its title and on the rail; <kbd>Prefix</kbd> <kbd>i</kbd> opens an Inbox listing every approval, question and finished turn across every session and machine; agents mail each other and ask you questions with fixed answers; <code>tuios fan</code> starts one prompt across several agents in separate git worktrees; and <code>tuios mcp</code> offers all of it as MCP tools. One command wires a harness up:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tuios</span> integration install claude-code <span class="at">--mcp</span> <span class="at">--statusline</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tuios</span> doctor agents</span></code></pre></div>
+<p>That whole world is <a href="agents.html">Agents</a>.</p>
+<h2 id="how-this-manual-is-organised">How this manual is organised</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Chapter</th>
+<th>Read it when you want to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="tuios.html">1. Start Here</a></td>
+<td>Install, learn the vocabulary, run a first session (this page)</td>
+</tr>
+<tr>
+<td><a href="concepts.html">2. Core Concepts and the Screen</a></td>
+<td>Understand modes, tiling, layouts, the dock, the rail, overlays, copy mode, images and the mouse</td>
+</tr>
+<tr>
+<td><a href="keybindings.html">3. Keybindings and the Command Palette</a></td>
+<td>Look up a key, rebind one, add command keys, use the palette and hints</td>
+</tr>
+<tr>
+<td><a href="configuration.html">4. Configuration, Themes, Glyphs and Hooks</a></td>
+<td>Edit <code>config.toml</code> with every table and key, pick or write a theme, run hooks on events</td>
+</tr>
+<tr>
+<td><a href="sessions.html">5. Daemon, Sessions, Hosts and Shims</a></td>
+<td>Detach and reattach, survive restarts, reach other machines, use the ssh server, the web client and the tmux shim</td>
+</tr>
+<tr>
+<td><a href="agents.html">6. Agents, Inbox, Mail, Fleets and MCP</a></td>
+<td>Run coding agents in panes, answer them from the Inbox, let them talk, fan out fleets, serve MCP, scope grants</td>
+</tr>
+<tr>
+<td><a href="cli.html">7. CLI and Protocol Reference</a></td>
+<td>Find any subcommand or flag, parse <code>--json</code>, speak the socket protocol, subscribe to events</td>
+</tr>
+<tr>
+<td><a href="automation.html">8. Tapes and Scripted Workflows</a></td>
+<td>Script and record sessions with tapes, take screenshots, build startup layouts and shell-driven workflows</td>
+</tr>
+<tr>
+<td><a href="howto-extending.html">9. How To: Extend tuios</a></td>
+<td>Add a command to the palette, add a dock component, write hooks, themes, harness integrations, MCP tools, verbs and more</td>
+</tr>
+<tr>
+<td><a href="ecosystem.html">10. Ecosystem and Plugin Directory</a></td>
+<td>Find third-party dock components, themes, integrations, editor plugins and related tools, with links</td>
+</tr>
+</tbody>
+</table>
+<h3 id="conventions-used-throughout">Conventions used throughout</h3>
+<ul>
+<li>Keys are drawn as keycaps: <kbd>Ctrl</kbd>+<kbd>b</kbd> is one chord; <kbd>Prefix</kbd> <kbd>d</kbd> (with a space) is press-release-press.</li>
+<li>Every example is for v0.8.5 and was checked against the binary’s own <code>--help</code>, the <code>tuios list-verbs</code> catalogue, or the source tree at tag <code>v0.8.5</code>.</li>
+<li>Callouts mark notes, tips, warnings, worked examples and default values. Green numbered steps mark a how-to.</li>
+<li><code>$TUIOS_SESSION</code> and <code>$TUIOS_PANE_ID</code> in examples are the environment variables a pane already has; outside a pane, substitute a session name and a window name.</li>
+<li>Press <kbd>/</kbd> on any page of this manual to search its sections, <kbd>[</kbd> and <kbd>]</kbd> to move between chapters, and <kbd>t</kbd> to switch between light, dark and automatic themes.</li>
+</ul>
+<h2 id="where-to-get-more">Where to get more</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Source</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tuios --skill</code> and <code>tuios --skill all</code></td>
+<td>The agent-facing guide embedded in the binary; always matches the build you run</td>
+</tr>
+<tr>
+<td><code>tuios &lt;command&gt; --help</code></td>
+<td>Authoritative flags for that build</td>
+</tr>
+<tr>
+<td><code>tuios list-verbs [VERB]</code></td>
+<td>The protocol catalogue with every argument</td>
+</tr>
+<tr>
+<td><code>tuios keybinds list</code>, <code>tuios keybinds explain &lt;key&gt;</code>, <code>tuios keybinds doctor</code></td>
+<td>Your effective keys</td>
+</tr>
+<tr>
+<td><code>tuios list-options</code></td>
+<td>Every configuration option</td>
+</tr>
+<tr>
+<td><a href="https://tuios.dev">tuios.dev</a></td>
+<td>Hosted documentation</td>
+</tr>
+<tr>
+<td><a href="https://tuios.dev/learn">tuios.dev/learn</a></td>
+<td>The guided tour: the real app compiled to WebAssembly</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/tuios">github.com/Gaurav-Gosain/tuios</a></td>
+<td>Source, releases, <code>docs/</code> folder</td>
+</tr>
+<tr>
+<td><a href="https://deepwiki.com/Gaurav-Gosain/tuios">deepwiki.com/Gaurav-Gosain/tuios</a></td>
+<td>Generated wiki over the source</td>
+</tr>
+</tbody>
+</table>
+      </article>
+
+      <nav class="chapter-foot" id="chapter-foot" aria-label="Previous and next chapter">
+        <a class="prev empty" id="prev-link" href="#"><small>Previous</small><span></span></a>
+        <a class="next empty" id="next-link" href="#"><small>Next</small><span></span></a>
+      </nav>
+      <div class="colophon">
+        <span>tuios manual · generated by pandoc · usable offline from <code>file://</code></span>
+        <span><a href="https://tuios.dev">tuios.dev</a> · <a href="https://github.com/Gaurav-Gosain/tuios">source</a></span>
+      </div>
+    </main>
+
+    <aside class="page-side">
+      <div class="side-label">On this page</div>
+      <div class="progress"><div id="progress-bar"></div></div>
+      <nav id="page-toc"><ul>
+<li><a href="#what-tuios-is-in-one-screen" id="toc-what-tuios-is-in-one-screen">What tuios is, in one screen</a></li>
+<li><a href="#installing" id="toc-installing">Installing</a></li>
+<li><a href="#the-mental-model" id="toc-the-mental-model">The mental model</a></li>
+<li><a href="#a-first-session" id="toc-a-first-session">A first session</a>
+<ul>
+<li><a href="#the-keys-you-will-use-on-day-one" id="toc-the-keys-you-will-use-on-day-one">The keys you will use on day one</a></li>
+</ul></li>
+<li><a href="#driving-it-from-a-shell" id="toc-driving-it-from-a-shell">Driving it from a shell</a></li>
+<li><a href="#agents-briefly" id="toc-agents-briefly">Agents, briefly</a></li>
+<li><a href="#how-this-manual-is-organised" id="toc-how-this-manual-is-organised">How this manual is organised</a>
+<ul>
+<li><a href="#conventions-used-throughout" id="toc-conventions-used-throughout">Conventions used throughout</a></li>
+</ul></li>
+<li><a href="#where-to-get-more" id="toc-where-to-get-more">Where to get more</a></li>
+</ul></nav>
+    </aside>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+
+  /* ── theme: auto / light / dark, remembered ── */
+  var THEME_KEY = 'tuios-manual-theme';
+  var media = window.matchMedia('(prefers-color-scheme: dark)');
+  var btn = document.getElementById('theme-btn');
+  function applyTheme(mode) {
+    root.setAttribute('data-theme', mode);
+    root.classList.toggle('dark-auto', mode === 'auto' && media.matches);
+    btn.textContent = mode;
+  }
+  var saved = 'auto';
+  try { saved = localStorage.getItem(THEME_KEY) || 'auto'; } catch (e) {}
+  applyTheme(saved);
+  media.addEventListener && media.addEventListener('change', function () { applyTheme(root.getAttribute('data-theme')); });
+  function cycleTheme() {
+    var order = ['auto', 'light', 'dark'];
+    var next = order[(order.indexOf(root.getAttribute('data-theme')) + 1) % order.length];
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  }
+  btn.addEventListener('click', cycleTheme);
+
+  /* ── which chapter is this ── */
+  var here = (location.pathname.split('/').pop() || '').replace(/[?#].*$/, '');
+  var chapters = Array.prototype.slice.call(document.querySelectorAll('.book-chapters li'));
+  var idx = -1;
+  chapters.forEach(function (li, i) {
+    var a = li.querySelector('a');
+    if (a && a.getAttribute('href') === here) { li.classList.add('current'); idx = i; }
+  });
+  function fillFoot(id, li, cls) {
+    var el = document.getElementById(id);
+    if (!li) { el.classList.add('empty'); return; }
+    var a = li.querySelector('a');
+    el.href = a.getAttribute('href');
+    el.querySelector('span').textContent = a.querySelector('.label').textContent;
+    el.classList.remove('empty');
+  }
+  fillFoot('prev-link', idx > 0 ? chapters[idx - 1] : null);
+  fillFoot('next-link', idx >= 0 && idx < chapters.length - 1 ? chapters[idx + 1] : null);
+
+  /* ── heading anchors ── */
+  document.querySelectorAll('article h2[id], article h3[id], article h4[id]').forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'anchor'; a.href = '#' + h.id; a.textContent = '#'; a.setAttribute('aria-label', 'Link to this section');
+    h.appendChild(a);
+  });
+
+  /* ── wide tables scroll instead of overflowing ── */
+  document.querySelectorAll('article table').forEach(function (t) {
+    var w = document.createElement('div'); w.className = 'table-wrap';
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+
+  /* ── copy buttons + language labels on code blocks ── */
+  document.querySelectorAll('article pre').forEach(function (pre) {
+    var host = pre.parentNode.classList && pre.parentNode.classList.contains('sourceCode') ? pre.parentNode : pre;
+    var code = pre.querySelector('code');
+    var lang = '';
+    (code ? code.className : pre.className).split(/\s+/).forEach(function (c) {
+      if (c && c !== 'sourceCode' && c !== 'numberSource') lang = c;
+    });
+    var tools = document.createElement('div'); tools.className = 'code-tools';
+    if (lang) { var l = document.createElement('span'); l.className = 'code-lang'; l.textContent = lang; tools.appendChild(l); }
+    var b = document.createElement('button'); b.className = 'copy-btn'; b.type = 'button'; b.textContent = 'copy';
+    b.addEventListener('click', function () {
+      var text = (code || pre).innerText.replace(/\n$/, '');
+      function done() { b.textContent = 'copied'; b.classList.add('done'); setTimeout(function () { b.textContent = 'copy'; b.classList.remove('done'); }, 1400); }
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, done); }
+      else { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(); }
+    });
+    tools.appendChild(b);
+    host.appendChild(tools);
+  });
+
+  /* ── outline scroll-spy + reading progress ── */
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll('#page-toc a[href^="#"]'));
+  var targets = tocLinks.map(function (a) { return document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1))); });
+  var bar = document.getElementById('progress-bar');
+  var ticking = false;
+  function spy() {
+    ticking = false;
+    var y = window.scrollY + 90, current = -1;
+    for (var i = 0; i < targets.length; i++) { if (targets[i] && targets[i].offsetTop <= y) current = i; }
+    tocLinks.forEach(function (a, i) { a.classList.toggle('active', i === current); });
+    if (current >= 0) {
+      var act = tocLinks[current], side = document.querySelector('.page-side');
+      if (side) { var r = act.getBoundingClientRect(), s = side.getBoundingClientRect(); if (r.top < s.top + 40 || r.bottom > s.bottom - 40) act.scrollIntoView({ block: 'center' }); }
+    }
+    if (bar) { var h = document.documentElement; var p = h.scrollHeight - h.clientHeight; bar.style.width = (p > 0 ? Math.min(100, 100 * window.scrollY / p) : 0) + '%'; }
+  }
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(spy); } });
+  spy();
+
+  /* ── search: sections of this chapter + chapter names ── */
+  var input = document.getElementById('search');
+  var results = document.getElementById('search-results');
+  var headings = Array.prototype.slice.call(document.querySelectorAll('article h2[id], article h3[id], article h4[id]')).map(function (h) {
+    var trail = [], el = h;
+    var level = parseInt(h.tagName.slice(1), 10);
+    while (el && level > 2) { el = el.previousElementSibling; if (el && /^H[1-6]$/.test(el.tagName) && parseInt(el.tagName.slice(1), 10) < level) { trail.unshift(el.firstChild ? el.firstChild.textContent : ''); level = parseInt(el.tagName.slice(1), 10); } }
+    return { text: h.firstChild ? h.firstChild.textContent : h.textContent, id: h.id, trail: trail.join(' › '), kind: h.tagName.toLowerCase() };
+  });
+  var chapterItems = chapters.map(function (li) { var a = li.querySelector('a'); return { text: a.querySelector('.label').textContent, href: a.getAttribute('href'), kind: 'chapter' }; });
+  var active = -1;
+  function render(q) {
+    q = q.trim().toLowerCase();
+    results.innerHTML = ''; active = -1;
+    if (!q) { results.classList.remove('open'); return; }
+    var words = q.split(/\s+/);
+    function score(t) { t = t.toLowerCase(); var s = 0; for (var i = 0; i < words.length; i++) { var p = t.indexOf(words[i]); if (p < 0) return -1; s += (p === 0 ? 3 : 1); } return s; }
+    var hits = [];
+    headings.forEach(function (h) { var s = score(h.text + ' ' + h.trail); if (s >= 0) hits.push({ s: s + (h.kind === 'h2' ? 1 : 0), label: h.text, sub: h.trail || 'this chapter', href: '#' + h.id }); });
+    chapterItems.forEach(function (c) { var s = score(c.text); if (s >= 0) hits.push({ s: s, label: c.text, sub: 'chapter', href: c.href }); });
+    hits.sort(function (a, b) { return b.s - a.s; });
+    if (!hits.length) { results.innerHTML = '<div class="none">No matching section in this chapter.</div>'; results.classList.add('open'); return; }
+    hits.slice(0, 30).forEach(function (h) {
+      var a = document.createElement('a'); a.href = h.href;
+      a.innerHTML = '<span></span><small></small>';
+      a.firstChild.textContent = h.label; a.lastChild.textContent = h.sub;
+      a.addEventListener('click', function () { results.classList.remove('open'); });
+      results.appendChild(a);
+    });
+    results.classList.add('open');
+  }
+  function move(d) {
+    var items = results.querySelectorAll('a'); if (!items.length) return;
+    active = (active + d + items.length) % items.length;
+    items.forEach(function (a, i) { a.classList.toggle('active', i === active); });
+    items[active].scrollIntoView({ block: 'nearest' });
+  }
+  input.addEventListener('input', function () { render(input.value); });
+  input.addEventListener('focus', function () { if (input.value) render(input.value); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+    else if (e.key === 'Enter') { var a = results.querySelectorAll('a')[active < 0 ? 0 : active]; if (a) { a.click(); location.href = a.getAttribute('href'); } }
+    else if (e.key === 'Escape') { input.value = ''; results.classList.remove('open'); input.blur(); }
+  });
+  document.addEventListener('click', function (e) { if (!e.target.closest('.search-wrap')) results.classList.remove('open'); });
+
+  /* ── keys: / [ ] t ── */
+  document.addEventListener('keydown', function (e) {
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === '/') { e.preventDefault(); input.focus(); input.select(); }
+    else if (e.key === 't') { cycleTheme(); }
+    else if (e.key === '[') { var p = document.getElementById('prev-link'); if (!p.classList.contains('empty')) location.href = p.getAttribute('href'); }
+    else if (e.key === ']') { var n = document.getElementById('next-link'); if (!n.classList.contains('empty')) location.href = n.getAttribute('href'); }
+  });
+})();
+</script>
+</body>
+</html>

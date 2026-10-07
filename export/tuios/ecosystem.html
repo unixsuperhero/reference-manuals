@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="pandoc">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="A source-checked directory of everything found on the public internet that plugs into, extends, integrates with or packages tuios, with links, as of 7 October 2026.">
+  <title>TUIOS: Ecosystem and Plugin Directory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ════════════════════════════════════════════════════════════
+       TUIOS manual template: a three-column "book" layout.
+       left  = chapter list (shared partial)   center = chapter
+       right = on-this-page outline            keys: / [ ] t ?
+       ════════════════════════════════════════════════════════════ */
+    :root {
+      --font-body: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+      --nav-w: 248px;
+      --toc-w: 236px;
+      --content-w: 86ch;
+      --radius: 10px;
+
+      /* light: warm paper */
+      --bg:        #f7f4ee;
+      --bg2:       #efeae1;
+      --panel:     #fffdf9;
+      --line:      #ddd5c7;
+      --line2:     #c9bfae;
+      --text:      #1d1a16;
+      --text2:     #4f4840;
+      --text3:     #857b6e;
+      --accent:    #7a3fd6;
+      --accent2:   #5b2bb0;
+      --accent-bg: rgba(122,63,214,0.10);
+      --green:     #1f8a4c;
+      --amber:     #b4690e;
+      --red:       #c0392b;
+      --blue:      #1d63c7;
+      /* terminal surfaces stay dark in both themes */
+      --term-bg:   #16131d;
+      --term-bg2:  #1f1a2a;
+      --term-line: #332b45;
+      --term-text: #ece6f6;
+      --term-dim:  #9a8fb3;
+      --kbd-bg:    #fffdf9;
+      --kbd-line:  #c9bfae;
+      --kbd-shadow:#b4a995;
+    }
+    :root[data-theme="dark"] { color-scheme: dark; }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"],
+    :root[data-theme="auto"].dark-auto {
+      --bg:        #100e15;
+      --bg2:       #17141f;
+      --panel:     #1a1723;
+      --line:      #2b2638;
+      --line2:     #3b3450;
+      --text:      #ebe6f5;
+      --text2:     #bbb2cc;
+      --text3:     #7f7596;
+      --accent:    #b48cff;
+      --accent2:   #cdb0ff;
+      --accent-bg: rgba(180,140,255,0.14);
+      --green:     #5fd38a;
+      --amber:     #f0b24a;
+      --red:       #ff6b5c;
+      --blue:      #6fa8ff;
+      --kbd-bg:    #221d2e;
+      --kbd-line:  #3b3450;
+      --kbd-shadow:#0c0a10;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1.02rem;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    a { color: var(--accent); }
+    a:hover { color: var(--accent2); }
+
+    /* ── Top bar ─────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; gap: 1rem;
+      height: 52px; padding: 0 1rem;
+      background: color-mix(in srgb, var(--bg) 86%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: flex; align-items: center; gap: 0.55rem;
+      font-family: var(--font-mono); font-weight: 600; font-size: 0.86rem;
+      color: var(--text); text-decoration: none; letter-spacing: 0.02em;
+    }
+    .brand .dot {
+      width: 10px; height: 10px; border-radius: 3px;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+    .brand .manual { color: var(--text3); font-weight: 400; }
+    .topbar .spacer { flex: 1; }
+    .search-wrap { position: relative; width: min(360px, 40vw); }
+    .search-wrap input {
+      width: 100%; height: 34px; padding: 0 2.4rem 0 0.8rem;
+      border: 1px solid var(--line2); border-radius: 8px;
+      background: var(--panel); color: var(--text);
+      font: 0.86rem var(--font-body);
+    }
+    .search-wrap input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .search-wrap kbd.hint {
+      position: absolute; right: 0.45rem; top: 50%; transform: translateY(-50%);
+      font-size: 0.66rem; padding: 0 0.4rem; pointer-events: none;
+    }
+    .search-results {
+      position: absolute; top: 38px; left: 0; right: 0; max-height: 60vh; overflow: auto;
+      background: var(--panel); border: 1px solid var(--line2); border-radius: 8px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.22); display: none; z-index: 60;
+    }
+    .search-results.open { display: block; }
+    .search-results a {
+      display: block; padding: 0.5rem 0.8rem; text-decoration: none; color: var(--text);
+      font-size: 0.86rem; border-bottom: 1px solid var(--line);
+    }
+    .search-results a small { display: block; color: var(--text3); font-family: var(--font-mono); font-size: 0.68rem; }
+    .search-results a:hover, .search-results a.active { background: var(--accent-bg); }
+    .search-results .none { padding: 0.6rem 0.8rem; color: var(--text3); font-size: 0.82rem; }
+    .iconbtn {
+      appearance: none; border: 1px solid var(--line2); background: var(--panel); color: var(--text2);
+      height: 34px; min-width: 34px; padding: 0 0.55rem; border-radius: 8px; cursor: pointer;
+      font: 500 0.8rem var(--font-mono);
+    }
+    .iconbtn:hover { color: var(--accent2); border-color: var(--accent); }
+    .all-docs { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text3); text-decoration: none; }
+    .all-docs:hover { color: var(--accent2); }
+
+    /* ── Shell ───────────────────────────────── */
+    .shell {
+      display: grid;
+      grid-template-columns: var(--nav-w) minmax(0, 1fr) var(--toc-w);
+      gap: 0; min-height: calc(100vh - 52px);
+    }
+    .book-side, .page-side {
+      position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto;
+      padding: 1.4rem 1rem 2rem;
+      scrollbar-width: thin; scrollbar-color: var(--line2) transparent;
+    }
+    .book-side { border-right: 1px solid var(--line); background: var(--bg2); }
+    .page-side { border-left: 1px solid var(--line); }
+    .side-label {
+      font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text3); margin: 0 0 0.7rem 0.5rem;
+    }
+
+    /* ── Book nav (left) ─────────────────────── */
+    .book-chapters { list-style: none; }
+    .book-chapters li a {
+      display: grid; grid-template-columns: 2.2rem 1fr; align-items: baseline;
+      padding: 0.42rem 0.5rem; border-radius: 7px; text-decoration: none;
+      color: var(--text2); font-size: 0.86rem; line-height: 1.3;
+    }
+    .book-chapters li a .num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text3); }
+    .book-chapters li a:hover { background: var(--panel); color: var(--text); }
+    .book-chapters li.current a { background: var(--accent-bg); color: var(--text); font-weight: 600; }
+    .book-chapters li.current a .num { color: var(--accent); }
+    .book-chapters li.howto a .label::after {
+      content: 'how to'; margin-left: 0.4rem; font: 600 0.58rem var(--font-mono);
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--green);
+      border: 1px solid var(--green); border-radius: 4px; padding: 0 0.3rem; vertical-align: middle;
+    }
+    .book-chapters li.hidden { display: none; }
+    .keys-help {
+      margin-top: 1.6rem; padding: 0.8rem; border: 1px dashed var(--line2); border-radius: 8px;
+      font-size: 0.74rem; color: var(--text3); line-height: 1.9;
+    }
+    .keys-help kbd { font-size: 0.66rem; }
+
+    /* ── Page outline (right) ────────────────── */
+    .page-side nav ul { list-style: none; }
+    .page-side nav li { margin: 0; }
+    .page-side nav a {
+      display: block; padding: 0.26rem 0.55rem; border-left: 2px solid transparent;
+      color: var(--text3); text-decoration: none; font-size: 0.78rem; line-height: 1.35;
+    }
+    .page-side nav a:hover { color: var(--text); }
+    .page-side nav a.active { color: var(--accent2); border-left-color: var(--accent); background: var(--accent-bg); }
+    .page-side nav ul ul { padding-left: 0.7rem; }
+    .page-side nav ul ul a { font-size: 0.72rem; }
+    .page-side nav ul ul ul { display: none; }
+    .page-side nav li.hidden { display: none; }
+    .progress { height: 3px; background: var(--line); border-radius: 2px; margin: 0 0.5rem 1rem; overflow: hidden; }
+    .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--blue)); }
+
+    /* ── Article ─────────────────────────────── */
+    .content { padding: 2.6rem 3rem 6rem; display: flex; flex-direction: column; align-items: center; }
+    article, .chapter-head, .chapter-foot { width: 100%; max-width: var(--content-w); }
+    .chapter-head { margin-bottom: 2.4rem; animation: rise 0.35s ease-out both; }
+    .chapter-kicker {
+      display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text3); margin-bottom: 0.9rem;
+    }
+    .chapter-kicker .chip {
+      padding: 0.1rem 0.5rem; border: 1px solid var(--accent); border-radius: 999px;
+      color: var(--accent); letter-spacing: 0.1em;
+    }
+    .chapter-head h1 {
+      font-size: clamp(1.9rem, 4vw, 2.7rem); line-height: 1.12; letter-spacing: -0.025em;
+      font-weight: 800; color: var(--text);
+    }
+    .chapter-head h1 .prefix { color: var(--text3); font-weight: 500; }
+    .chapter-summary { margin-top: 0.9rem; font-size: 1.08rem; color: var(--text2); max-width: 70ch; }
+    .tag-row { margin-top: 1rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .tag-row span {
+      font: 500 0.66rem var(--font-mono); color: var(--text3); background: var(--bg2);
+      border: 1px solid var(--line); border-radius: 5px; padding: 0.1rem 0.45rem;
+    }
+
+    article h2 {
+      font-size: 1.55rem; font-weight: 700; letter-spacing: -0.015em; line-height: 1.25;
+      margin: 3.2rem 0 1rem; padding-top: 1.4rem; border-top: 1px solid var(--line);
+      scroll-margin-top: 72px; position: relative;
+    }
+    article h2::before {
+      content: '§'; position: absolute; left: -1.6rem; top: 1.45rem;
+      font-family: var(--font-mono); font-weight: 400; color: var(--line2); font-size: 1.1rem;
+    }
+    article h3 { font-size: 1.18rem; font-weight: 650; margin: 2.2rem 0 0.7rem; scroll-margin-top: 72px; }
+    article h4 { font-size: 0.98rem; font-weight: 650; margin: 1.6rem 0 0.5rem; color: var(--text2); scroll-margin-top: 72px; }
+    article h5, article h6 { font-size: 0.9rem; margin: 1.2rem 0 0.4rem; color: var(--text2); }
+    article h2 a.anchor, article h3 a.anchor, article h4 a.anchor {
+      opacity: 0; margin-left: 0.4rem; font-weight: 400; color: var(--text3); text-decoration: none; font-family: var(--font-mono);
+    }
+    article h2:hover a.anchor, article h3:hover a.anchor, article h4:hover a.anchor { opacity: 1; }
+    article p { margin-bottom: 1.1rem; color: var(--text); }
+    article p, article li { max-width: 78ch; }
+    article ul, article ol { margin: 0 0 1.2rem 1.4rem; }
+    article li { margin-bottom: 0.3rem; }
+    article li > ul, article li > ol { margin-top: 0.3rem; margin-bottom: 0.4rem; }
+    article strong { font-weight: 650; }
+    article hr { border: 0; border-top: 1px solid var(--line); margin: 2.4rem 0; }
+    article blockquote {
+      margin: 1.2rem 0; padding: 0.6rem 1rem; border-left: 3px solid var(--line2);
+      color: var(--text2); background: var(--bg2); border-radius: 0 8px 8px 0;
+    }
+
+    /* inline code, kbd */
+    article code {
+      font-family: var(--font-mono); font-size: 0.86em;
+      background: var(--bg2); border: 1px solid var(--line); border-radius: 5px; padding: 0.08em 0.38em;
+      color: var(--text);
+    }
+    article a code { color: var(--accent); }
+    kbd {
+      display: inline-block; font-family: var(--font-mono); font-size: 0.76em; line-height: 1.5;
+      padding: 0 0.42em; border-radius: 5px; vertical-align: baseline;
+      background: var(--kbd-bg); border: 1px solid var(--kbd-line);
+      box-shadow: inset 0 -2px 0 var(--kbd-shadow); color: var(--text);
+      white-space: nowrap;
+    }
+    kbd + kbd { margin-left: 0.15em; }
+
+    /* code blocks, always terminal-dark */
+    article pre {
+      position: relative; margin: 0 0 1.4rem; padding: 1rem 6.5rem 1rem 1.1rem;
+      background: var(--term-bg); border: 1px solid var(--term-line); border-radius: var(--radius);
+      overflow-x: auto; font-family: var(--font-mono); font-size: 0.84rem; line-height: 1.6;
+      color: var(--term-text); tab-size: 4;
+    }
+    article pre code { background: transparent; border: 0; padding: 0; font-size: inherit; color: inherit; }
+    article div.sourceCode { margin: 0 0 1.4rem; position: relative; }
+    article div.sourceCode pre { margin: 0; }
+    .code-tools {
+      position: absolute; top: 0.45rem; right: 0.5rem; display: flex; gap: 0.35rem; align-items: center; z-index: 2;
+    }
+    .code-lang {
+      font: 500 0.62rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--term-dim); padding: 0.15rem 0.45rem; border: 1px solid var(--term-line); border-radius: 5px;
+    }
+    .copy-btn {
+      appearance: none; cursor: pointer; font: 500 0.62rem var(--font-mono); letter-spacing: 0.08em;
+      color: var(--term-dim); background: var(--term-bg2); border: 1px solid var(--term-line); border-radius: 5px;
+      padding: 0.15rem 0.5rem; opacity: 0; transition: opacity 0.15s, color 0.15s;
+    }
+    article pre:hover .copy-btn, article div.sourceCode:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+    .copy-btn:hover { color: var(--term-text); }
+    .copy-btn.done { color: #5fd38a; border-color: #5fd38a; opacity: 1; }
+
+    /* tables */
+    article table {
+      width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0 0 1.6rem;
+      border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+      background: var(--panel);
+    }
+    article thead th {
+      text-align: left; padding: 0.55rem 0.75rem; font-family: var(--font-mono); font-weight: 600;
+      font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3);
+      background: var(--bg2); border-bottom: 1px solid var(--line2);
+    }
+    article td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    article tbody tr:last-child td { border-bottom: 0; }
+    article tbody tr:hover td { background: var(--accent-bg); }
+    article td code { white-space: nowrap; }
+    .table-wrap { overflow-x: auto; margin-bottom: 1.6rem; }
+    .table-wrap table { margin-bottom: 0; }
+
+    /* ── Callouts (pandoc fenced divs) ───────── */
+    article .note, article .tip, article .warning, article .example, article .default, article .howto {
+      margin: 1.4rem 0; padding: 0.9rem 1.1rem 0.6rem; border-radius: var(--radius);
+      border: 1px solid var(--line); border-left-width: 4px; background: var(--panel);
+    }
+    article .note::before, article .tip::before, article .warning::before, article .example::before, article .default::before {
+      display: block; font: 600 0.64rem var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 0.4rem;
+    }
+    article .note    { border-left-color: var(--blue); }  article .note::before    { content: 'Note'; color: var(--blue); }
+    article .tip     { border-left-color: var(--green); } article .tip::before     { content: 'Tip'; color: var(--green); }
+    article .warning { border-left-color: var(--red); }   article .warning::before { content: 'Warning'; color: var(--red); }
+    article .example { border-left-color: var(--accent); }article .example::before { content: 'Example'; color: var(--accent); }
+    article .default { border-left-color: var(--amber); } article .default::before { content: 'Default'; color: var(--amber); }
+    article .note p:last-child, article .tip p:last-child, article .warning p:last-child,
+    article .example p:last-child, article .default p:last-child { margin-bottom: 0.4rem; }
+
+    /* ── How-to steps ────────────────────────── */
+    article .howto { border-left-color: var(--green); padding: 1rem 1.2rem 0.4rem; counter-reset: step; }
+    article .howto > ol { list-style: none; margin-left: 0; }
+    article .howto > ol > li {
+      position: relative; padding-left: 2.6rem; margin-bottom: 1.1rem; counter-increment: step;
+    }
+    article .howto > ol > li::before {
+      content: counter(step); position: absolute; left: 0; top: 0.1rem;
+      width: 1.8rem; height: 1.8rem; border-radius: 50%; display: grid; place-items: center;
+      background: var(--green); color: #fff; font: 700 0.8rem var(--font-mono);
+    }
+    article .howto > ol > li > p:first-child { font-weight: 600; margin-bottom: 0.4rem; }
+
+    /* ── Chapter footer ──────────────────────── */
+    .chapter-foot {
+      margin-top: 4rem; padding-top: 1.4rem; border-top: 1px solid var(--line);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    .chapter-foot a {
+      display: block; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: var(--radius);
+      text-decoration: none; color: var(--text); background: var(--panel);
+    }
+    .chapter-foot a:hover { border-color: var(--accent); }
+    .chapter-foot a small { display: block; font: 500 0.62rem var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.25rem; }
+    .chapter-foot a.next { text-align: right; }
+    .chapter-foot a.empty { visibility: hidden; }
+    .colophon {
+      width: 100%; max-width: var(--content-w); margin-top: 1.6rem;
+      font: 0.66rem var(--font-mono); color: var(--text3); display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .colophon a { color: var(--text3); text-decoration: none; }
+    .colophon a:hover { color: var(--accent2); }
+
+    /* ── Syntax highlighting (pandoc) ────────── */
+        pre.sourceCode, div.sourceCode pre, pre > code.sourceCode { background: var(--term-bg) !important; }
+    code span.kw { color: #c792ea; } code span.cf { color: #c792ea; }
+    code span.dt { color: #82aaff; } code span.dv, code span.fl, code span.bn { color: #f78c6c; }
+    code span.co, code span.do { color: #7e7a94; font-style: italic; }
+    code span.st, code span.ss, code span.vs { color: #c3e88d; }
+    code span.op { color: #89ddff; } code span.fu { color: #82aaff; }
+    code span.va { color: #f07178; } code span.at { color: #ffcb6b; }
+    code span.an, code span.wa { color: #f0b24a; } code span.er { color: #ff5370; }
+    code span.ex, code span.bu { color: #ffcb6b; } code span.ot { color: #89ddff; }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 4px; }
+
+    @media (max-width: 1180px) {
+      .shell { grid-template-columns: var(--nav-w) minmax(0, 1fr); }
+      .page-side { display: none; }
+    }
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: minmax(0, 1fr); }
+      .book-side { display: none; }
+      .content { padding: 1.6rem 1.1rem 4rem; }
+      article h2::before { display: none; }
+      .search-wrap { width: 46vw; }
+      .all-docs { display: none; }
+    }
+    @media print {
+      .topbar, .book-side, .page-side, .chapter-foot, .code-tools { display: none !important; }
+      .shell { display: block; }
+      body { background: #fff; color: #000; }
+      article pre { background: #f4f4f4; color: #000; border-color: #ccc; }
+      article a { color: inherit; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="tuios.html"><span class="dot"></span>tuios <span class="manual">/ manual</span></a>
+    <div class="spacer"></div>
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="Jump to a section…" autocomplete="off" aria-label="Search sections of this chapter">
+      <kbd class="hint">/</kbd>
+      <div id="search-results" class="search-results" role="listbox"></div>
+    </div>
+    <button id="theme-btn" class="iconbtn" title="Theme (t)">auto</button>
+    <a class="all-docs" href="../../index.html">← all docs</a>
+  </header>
+
+  <div class="shell">
+    <aside class="book-side">
+      <div class="side-label">Chapters</div>
+      <nav class="book-nav" aria-label="Manual chapters">
+        <ol class="book-chapters">
+          <li data-chapter="1"><a href="tuios.html"><span class="num">01</span><span class="label">Start Here</span></a></li>
+          <li data-chapter="2"><a href="concepts.html"><span class="num">02</span><span class="label">Core Concepts &amp; the Screen</span></a></li>
+          <li data-chapter="3"><a href="keybindings.html"><span class="num">03</span><span class="label">Keybindings &amp; Palette</span></a></li>
+          <li data-chapter="4"><a href="configuration.html"><span class="num">04</span><span class="label">Configuration, Themes, Hooks</span></a></li>
+          <li data-chapter="5"><a href="sessions.html"><span class="num">05</span><span class="label">Daemon, Sessions, Hosts</span></a></li>
+          <li data-chapter="6"><a href="agents.html"><span class="num">06</span><span class="label">Agents, Inbox, Mail, MCP</span></a></li>
+          <li data-chapter="7"><a href="cli.html"><span class="num">07</span><span class="label">CLI &amp; Protocol Reference</span></a></li>
+          <li data-chapter="8"><a href="automation.html"><span class="num">08</span><span class="label">Tapes &amp; Scripted Workflows</span></a></li>
+          <li data-chapter="9" class="howto"><a href="howto-extending.html"><span class="num">09</span><span class="label">How To: Extend tuios</span></a></li>
+          <li data-chapter="10"><a href="ecosystem.html"><span class="num">10</span><span class="label">Ecosystem &amp; Plugin Directory</span></a></li>
+        </ol>
+      </nav>      <div class="keys-help">
+        <kbd>/</kbd> search &nbsp; <kbd>[</kbd> <kbd>]</kbd> prev / next chapter<br>
+        <kbd>t</kbd> theme &nbsp; <kbd>Esc</kbd> close search
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="chapter-head">
+        <div class="chapter-kicker">
+          <span class="chip">Chapter 10</span>
+          <span>tuios manual</span>
+
+        </div>
+        <h1 id="chapter-title">TUIOS: Ecosystem and Plugin Directory</h1>
+        <p class="chapter-summary">A source-checked directory of everything found on the public internet that plugs into, extends, integrates with or packages tuios, with links, as of 7 October 2026.</p>
+        <div class="tag-row"><span>tuios</span><span>ecosystem</span><span>plugins</span><span>links</span></div>
+      </div>
+
+      <article>
+<p>tuios has no plugin registry and no plugin host of its own. What it has instead are several open edges: dock components are shell commands, themes are JSON files, coding-agent harnesses report through hooks tuios writes for them, the daemon speaks a JSON protocol that other programs can drive, it emulates the herdr socket so herdr tools work unchanged, and it ships a tmux shim. The ecosystem therefore lives in other people’s repositories, dotfiles and package feeds rather than in one place. This chapter is that place, as of <strong>7 October 2026</strong> against tuios <strong>v0.8.5</strong>.</p>
+<p>Every entry was checked by fetching the page, by a GitHub, npm or package-registry API call, or by GitHub code search; the few that were only seen in search results are marked with a dagger (†). “n/l” means no licence was visible. “Updated” is the repository’s last push unless noted. Nothing here is endorsed by the tuios project unless the entry says it is first-party or linked from the project’s own docs. Treat third-party scripts as untrusted until you have read them.</p>
+<div class="note">
+<p>How this list was built: every <code>.md</code>, <code>.nix</code>, <code>.toml</code> and <code>.sh</code> file in the tuios repository at tag <code>v0.8.5</code> and the hosted docs’ <code>llms-full.txt</code> were scanned for outbound links; GitHub repository, code, issue and pull-request searches were run for <code>tuios</code> and for strings only a tuios integration would contain (<code>[dock.custom</code>, <code>tuios set-agent-state</code>, <code>tuios-agent-state</code>, <code>TUIOS_PANE_ID</code>, <code>tuios.sock.herdr</code>); the AUR, Homebrew, Repology, GHCR, Chocolatey, conda and npm registries were queried; and web search was run in both standard and extended modes. The last section lists what came up empty so you know the search was done.</p>
+</div>
+<h2 id="quick-map">Quick map</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>If you want to</th>
+<th>Look at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Put something of your own in the dock</td>
+<td><a href="#dock-components">Dock components</a>, then <a href="howto-extending.html#how-to-add-a-dock-component">How To: add a dock component</a></td>
+</tr>
+<tr>
+<td>Match tuios to your terminal colours</td>
+<td><a href="#themes">Themes</a> and <code>tuios import-theme</code> in <a href="configuration.html#themes">Configuration</a></td>
+</tr>
+<tr>
+<td>Make a coding agent show its state in the rail</td>
+<td><a href="#coding-agent-harness-integrations">Harness integrations</a> and <a href="agents.html#harness-integrations">Agents</a></td>
+</tr>
+<tr>
+<td>Let an agent drive tuios with tools</td>
+<td><a href="#mcp">MCP</a></td>
+</tr>
+<tr>
+<td>Use a herdr tool, phone app or Neovim plugin</td>
+<td><a href="#herdr-compatibility-and-the-herdr-ecosystem">herdr compatibility</a> and <a href="#editor-plugins">Editor plugins</a></td>
+</tr>
+<tr>
+<td>Run a tmux-only tool inside tuios</td>
+<td><a href="#tmux-shim">tmux shim</a></td>
+</tr>
+<tr>
+<td>Install on a new machine</td>
+<td><a href="#packaging">Packaging</a></td>
+</tr>
+<tr>
+<td>See what others built on the protocol</td>
+<td><a href="#companion-tools-and-related-projects">Companion tools</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="dock-components">Dock components</h2>
+<p>A dock component is a <code>[dock.custom.&lt;name&gt;]</code> table in <code>config.toml</code> with a <code>command</code>, a <code>refresh</code> policy (<code>once</code>, <code>push</code>, an interval such as <code>"5s"</code>, or <code>event:&lt;name&gt;</code>), an optional <code>on-click</code>, and a <code>max-width</code>; it is placed in a region with <code>custom/&lt;name&gt;</code>. The complete contract and a worked recipe are in <a href="howto-extending.html#how-to-add-a-dock-component">How To: add a dock component</a>.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it does</th>
+<th>How it relates to tuios</th>
+<th>Author · licence · updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/tuios/tree/v0.8.5/examples/dock">Official dock examples</a></td>
+<td><code>agents.sh</code>, <code>battery.sh</code>, <code>git-branch.sh</code>, <code>inbox.sh</code>, <code>kube-context.sh</code>, a sample <code>dock.toml</code> and the README that is the contract</td>
+<td>First-party reference components</td>
+<td>Gaurav Gosain · MIT · v0.8.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/jack06215/dotfiles/blob/main/dot_config/tuios/dock/executable_powerline.sh">jack06215 powerline dock</a></td>
+<td>Runs tmux-powerline segments and rewrites tmux <code>#[fg=...]</code> markup into SGR escapes for a dock cell</td>
+<td>Wired as <code>[dock.custom.left]</code> and <code>[dock.custom.right]</code> with <code>refresh = "5s"</code> and <code>max-width = 80</code> in the same repo’s <code>config.toml</code>, so the dock shows the same bar as tmux</td>
+<td>jack06215 · n/l · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/eleonorayaya/utena">utena dock cell</a></td>
+<td>Workspace manager for tuios whose tuios side adds a <code>custom/utena</code> cell that runs <code>utena status-line</code></td>
+<td>Dock component plus popups and an <code>after-attach</code> hook (see <a href="#companion-tools-and-related-projects">Companion tools</a>)</td>
+<td>eleonorayaya · n/l · 2026-10-04</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Whimski/dotfiles/blob/main/.config/tuios/toggle-chrome.sh">Whimski toggle-chrome</a></td>
+<td>Toggles the dock between hidden and top, and toggles shared borders, through <code>tuios get-config</code> and <code>tuios set-config</code></td>
+<td>A dock helper rather than a component; the repo’s <code>config.toml</code> carries commented <code>[dock.custom.branch]</code> examples</td>
+<td>Whimski · n/l · 2026-10-05</td>
+</tr>
+</tbody>
+</table>
+<p>Other public dotfiles with a tuios <code>config.toml</code> that sets <code>dock</code> options (ordinary configuration, not reusable components): hugotown, jemag, JustBarnt, link1183, LizardLiang, MateusDallIgna, RedEye-Developers, samyankc and explesy, each at <code>tuios/config.toml</code> inside the user’s <code>dotfiles</code> repository on GitHub.</p>
+<h2 id="themes">Themes</h2>
+<p>tuios bundles 342 themes from the bubbletint palette library. A custom theme is a JSON file in <code>~/.config/tuios/themes/</code> with <code>id</code>, <code>display_name</code>, <code>fg</code>, <code>bg</code>, <code>cursor</code>, the eight ANSI colours and their <code>bright_*</code> variants, and <code>tuios import-theme</code> converts kitty, Ghostty, Alacritty and WezTerm schemes. The schema is in <a href="configuration.html#themes">Configuration</a>; writing one is in <a href="howto-extending.html#how-to-write-a-theme">How To</a>.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it does</th>
+<th>How it relates to tuios</th>
+<th>Author · licence · updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/lrstanley/bubbletint">bubbletint</a></td>
+<td>Go library of terminal colour palettes</td>
+<td>The upstream source of the built-in themes, credited on tuios.dev</td>
+<td>lrstanley · MIT · 2026-10-01</td>
+</tr>
+<tr>
+<td><a href="https://github.com/arunoruto/flake/blob/main/modules/home-manager/theming/stylix/targets/tuios/hm.nix">Stylix target for tuios</a></td>
+<td>A Stylix <code>mkTarget</code> that generates a tuios theme from base16 colours</td>
+<td>Third-party; upstream Stylix has no tuios target. Needs that flake’s own <code>programs.tuios</code> Home Manager module</td>
+<td>arunoruto · MIT · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/SvenDowideit/swamp-extensions/tree/main/extensions/models/tuios/themes">swamp-extensions themes</a></td>
+<td><code>borland_modern_blue.json</code>, <code>swamp_club.json</code> and a <code>tuios-theme.yaml</code> model</td>
+<td>Part of the <code>@svendowideit/tuios</code> swamp extension (see <a href="#packaging">Packaging</a>)</td>
+<td>Sven Dowideit · n/l · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/JustBarnt/dotfiles/blob/main/tuios/themes/everforest.json">JustBarnt everforest</a></td>
+<td>Everforest in tuios JSON</td>
+<td>A custom theme file</td>
+<td>JustBarnt · n/l · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/adamcstephens/dotfiles/blob/main/apps/tuios/themes/moonfly.json">adamcstephens moonfly</a></td>
+<td>Moonfly in tuios JSON, with a Nix wrapper in <code>apps/tuios/default.nix</code></td>
+<td>A custom theme file</td>
+<td>adamcstephens · Unlicense · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ColeJJ/nvim/blob/main/colors/tuios-custom-obsidian.json">ColeJJ obsidian</a></td>
+<td>A custom “obsidian” theme in tuios JSON</td>
+<td>A custom theme file</td>
+<td>ColeJJ · n/l · 2026-10-05</td>
+</tr>
+</tbody>
+</table>
+<p>No standalone theme-pack repository for tuios exists yet.</p>
+<h2 id="coding-agent-harness-integrations">Coding-agent harness integrations</h2>
+<p><code>tuios integration install [harness...]</code> writes managed hooks or plugins into each harness’s own configuration. Twelve harnesses report full state (claude-code, codex, copilot, cursor-agent, gemini-cli, opencode, kilo, amp, kimi, pi, omp, qwen); seven report the session only (antigravity, crush, devin, droid, grok, hermes, qoder). The plugin sources live in the tuios tree under <code>internal/integration/assets/</code> and <code>integrations/claude-code/</code>. The mechanics are in <a href="agents.html#harness-integrations">Agents</a>; adding a harness is in <a href="howto-extending.html#how-to-add-a-harness-integration">How To</a>.</p>
+<h3 id="upstream-hook-and-plugin-mechanisms-tuios-targets">Upstream hook and plugin mechanisms tuios targets</h3>
+<p>These are the pages the tuios docs cite for each harness, and what <code>integration install</code> writes.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Harness</th>
+<th>Upstream mechanism</th>
+<th>What tuios installs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Code</td>
+<td><a href="https://code.claude.com/docs/en/hooks">hooks</a></td>
+<td><code>hooks</code> entries in <code>~/.claude/settings.json</code></td>
+</tr>
+<tr>
+<td>Codex</td>
+<td><a href="https://developers.openai.com/codex/hooks">hooks</a></td>
+<td><code>~/.codex/hooks.json</code></td>
+</tr>
+<tr>
+<td>Gemini CLI</td>
+<td><a href="https://geminicli.com/docs/hooks/reference/">hooks reference</a></td>
+<td><code>hooks</code> in <code>~/.gemini/settings.json</code></td>
+</tr>
+<tr>
+<td>opencode</td>
+<td><a href="https://opencode.ai/docs/plugins/">plugins</a></td>
+<td><code>plugins/tuios-agent-state.js</code> in <code>~/.config/opencode</code></td>
+</tr>
+<tr>
+<td>Kilo</td>
+<td>opencode’s plugin API, which Kilo forks</td>
+<td><code>plugin/tuios-agent-state.js</code> in <code>~/.config/kilo</code></td>
+</tr>
+<tr>
+<td>Amp</td>
+<td><a href="https://ampcode.com/manual/plugin-api">plugin API</a></td>
+<td><code>plugins/tuios-agent-state.ts</code> in <code>~/.config/amp</code></td>
+</tr>
+<tr>
+<td>Pi</td>
+<td>Pi’s extension events</td>
+<td><code>extensions/tuios-agent-state.ts</code> in <code>~/.pi/agent</code></td>
+</tr>
+<tr>
+<td>oh-my-pi (omp)</td>
+<td><a href="https://github.com/can1357/oh-my-pi/blob/main/docs/extension-loading.md">extension loading</a>, <a href="https://github.com/can1357/oh-my-pi/blob/main/packages/coding-agent/src/extensibility/extensions/types.ts">extension types</a></td>
+<td><code>extensions/tuios-omp-agent-state.ts</code> in <code>~/.omp/agent</code>; needs omp 18.3.2 or newer</td>
+</tr>
+<tr>
+<td>Kimi Code CLI</td>
+<td><a href="https://www.kimi.com/code/docs/en/kimi-code-cli/customization/hooks.html">hooks</a></td>
+<td><code>[[hooks]]</code> in <code>~/.kimi-code/config.toml</code>; needs 0.14.0 or newer</td>
+</tr>
+<tr>
+<td>Qwen Code</td>
+<td><a href="https://github.com/QwenLM/qwen-code/blob/main/docs/users/features/hooks.md">hooks</a></td>
+<td><code>hooks</code> in <code>~/.qwen/settings.json</code></td>
+</tr>
+<tr>
+<td>GitHub Copilot CLI</td>
+<td><a href="https://docs.github.com/en/copilot/reference/hooks-reference">hooks reference</a></td>
+<td><code>hooks/tuios.json</code> in <code>~/.copilot</code></td>
+</tr>
+<tr>
+<td>Cursor Agent</td>
+<td><a href="https://cursor.com/docs/hooks">hooks</a></td>
+<td><code>~/.cursor/hooks.json</code></td>
+</tr>
+<tr>
+<td>Crush</td>
+<td><a href="https://github.com/charmbracelet/crush/blob/main/docs/hooks/README.md">hooks</a></td>
+<td>A <code>PreToolUse</code> session hook; Crush also reports over herdr’s protocol by itself</td>
+</tr>
+<tr>
+<td>Qoder CLI</td>
+<td><a href="https://docs.qoder.com/zh/cli/hooks">hooks</a></td>
+<td><code>hooks</code> in <code>~/.qoder/settings.json</code></td>
+</tr>
+<tr>
+<td>Antigravity, Devin, Droid, Grok, Hermes</td>
+<td>herdr’s installers for each</td>
+<td>Session hooks, or for Hermes a <code>plugins/tuios-agent-state/</code> plugin</td>
+</tr>
+<tr>
+<td>Agent Client Protocol</td>
+<td><a href="https://agentclientprotocol.com">agentclientprotocol.com</a></td>
+<td>The <code>acp</code> integration kind used by <code>tuios agent-proto</code></td>
+</tr>
+</tbody>
+</table>
+<p>Upstream repositories: <a href="https://github.com/can1357/oh-my-pi">oh-my-pi</a> (MIT) and <a href="https://github.com/charmbracelet/crush">Crush</a>.</p>
+<h3 id="third-party-hooks-and-integrations">Third-party hooks and integrations</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it does</th>
+<th>How it relates to tuios</th>
+<th>Author · licence · updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/meteor614/.dotfiles/blob/master/.codebuddy/hooks/herdr-agent-state.sh">meteor614 CodeBuddy and Reasonix hooks</a></td>
+<td>Reports CodeBuddy and Reasonix agent state over herdr’s protocol</td>
+<td>Written to coexist with tuios: it exits when <code>TUIOS_ENV=1</code>, because tuios’s herdr socket and <code>tuios agent-hook claude-code</code> already cover those panes</td>
+<td>meteor614 · n/l · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/diegosouza/demon-slayer-agents">demon-slayer-agents</a></td>
+<td>Multi-agent “Master and seats” orchestration; its <code>extensions/slayer.ts</code> Pi extension dispatches work with <code>tuios list-agents</code>, <code>tuios_ask_agent</code> and pane creation</td>
+<td>Built on the tuios agent bus and CLI</td>
+<td>diegosouza · n/l · 2026-10-05</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ktappdev/.pi/blob/main/agent/extensions/tuios-agent-state.ts">ktappdev/.pi</a></td>
+<td>A Pi configuration repo that commits the tuios-managed extension</td>
+<td>An example of what <code>tuios integration install pi</code> writes; not original work</td>
+<td>ktappdev · n/l · 2026-10-05</td>
+</tr>
+<tr>
+<td><a href="https://github.com/chenxin-yan/nix-dotfiles/blob/main/modules/features/cli/tuios.nix">chenxin-yan nix module</a> †</td>
+<td>A Home Manager feature module for tuios that references <code>tuios-agent-state</code></td>
+<td>Nix-managed tuios with agent-state wiring</td>
+<td>chenxin-yan · n/l · 2026-10-06</td>
+</tr>
+</tbody>
+</table>
+<h2 id="mcp">MCP</h2>
+<p><code>tuios mcp</code> is a stdio MCP server whose tools mirror daemon verbs. <code>tuios integration install &lt;harness&gt; --mcp</code> registers it read-only (or <code>--mcp-write</code> with writes) for Claude Code, Codex, Gemini CLI and opencode; other clients register it by hand, for example <code>claude mcp add tuios -- tuios mcp</code>. The tool list is in <a href="agents.html#the-mcp-server">Agents</a>.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/tuios/blob/v0.8.5/skills/tuios/mcp.md">The <code>mcp</code> skill topic</a></td>
+<td>First-party: setup, <code>--scope all</code>, and the tool list; also printed by <code>tuios --skill mcp</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/uwuclxdy/clauth">clauth</a></td>
+<td>A Claude Code multi-account manager with cross-account delegation over MCP (MIT). The tuios docs list it as a herdr-plugin tool run from a command key; it is not a tuios MCP client</td>
+</tr>
+<tr>
+<td><a href="https://github.com/hyb175/agent-fleet/issues/54">agent-fleet issue #54</a></td>
+<td>Cites tuios’s session-scoped MCP tools as prior art; a mention, not an integration</td>
+</tr>
+</tbody>
+</table>
+<p>No MCP registry lists tuios: Glama, PulseMCP, Smithery and mcp.so return only unrelated TUIO, TUUI and cmux servers.</p>
+<h2 id="herdr-compatibility-and-the-herdr-ecosystem">herdr compatibility and the herdr ecosystem</h2>
+<p>tuios emulates herdr’s socket API (tracking herdr v0.9.3’s schema), exports <code>HERDR_*</code> variables into panes, and listens at <code>$XDG_RUNTIME_DIR/tuios/tuios.sock.herdr</code>. The hosted page is <a href="https://tuios.dev/docs/herdr-compatibility">tuios.dev/docs/herdr-compatibility</a> and the design note is <a href="https://tuios.dev/blog/crush-reports-to-herdr-so-tuios-answers-as-herdr">the blog post on Crush and herdr</a>. Which herdr methods tuios answers and refuses is in <a href="agents.html#herdr-compatibility">Agents</a>.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it does</th>
+<th>How it works with tuios</th>
+<th>Author · licence · updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/herdrdev/herdr">herdr</a> (<a href="https://herdr.dev">site</a>, <a href="https://herdr.dev/docs/plugins/">plugins</a>)</td>
+<td>Terminal agent multiplexer</td>
+<td>The protocol tuios emulates</td>
+<td>herdrdev · Apache-2.0 · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/AltanS/collie">Collie</a></td>
+<td>Self-hosted phone PWA that drives agents in herdr, tmux, zellij, tuios or Tern</td>
+<td>Has a native tuios adapter (<code>bridge/mux/tuios/</code>, merged 2026-09-30) that talks to the daemon’s JSON verb socket; tuios replays a Collie request fixture in its conformance tests; it can also drive tuios through the tmux shim</td>
+<td>AltanS · MIT · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/zenbu-labs/terminal-browser">terminal-browser</a></td>
+<td>A web browser inside the terminal</td>
+<td><code>terminal-browser open URL --split right</code>; uses herdr <code>pane split/swap/run/neighbor/process-info</code>; needs kitty graphics in the outer terminal</td>
+<td>zenbu-labs · MIT · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/zenbu-labs/terminal-code">terminal-code (<code>tode</code>)</a></td>
+<td>VS Code in the terminal</td>
+<td><code>tode --split right</code>, the same herdr calls as terminal-browser</td>
+<td>zenbu-labs · MIT · 2026-10-01</td>
+</tr>
+<tr>
+<td><a href="https://github.com/paulbkim-dev/vim-herdr-navigation">vim-herdr-navigation</a></td>
+<td><kbd>Ctrl</kbd>+<kbd>h</kbd>/<kbd>j</kbd>/<kbd>k</kbd>/<kbd>l</kbd> across herdr panes and Vim splits</td>
+<td>Works through <code>pane focus --direction</code>; its herdr-side key binding is a plugin action tuios does not run</td>
+<td>paulbkim-dev · MIT · 2026-08-23</td>
+</tr>
+<tr>
+<td><a href="https://github.com/lmilojevicc/herdr-splits.nvim">herdr-splits.nvim</a></td>
+<td>Smart-splits navigation and resize for herdr and Neovim</td>
+<td>Navigation works; resize fails because tuios does not answer <code>pane.resize</code></td>
+<td>lmilojevicc · MIT · 2026-08-17</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Unayung/herdr-watch">herdr-watch</a></td>
+<td>herdr agent status on an Apple Watch</td>
+<td><code>HERDR_SOCKET_PATH="$XDG_RUNTIME_DIR/tuios/tuios.sock.herdr" node bridge.js</code></td>
+<td>Unayung · MIT · 2026-08-14</td>
+</tr>
+<tr>
+<td><a href="https://github.com/permgps/herdr-telegram-agents">herdr-telegram-agents</a></td>
+<td>Drive coding agents from Telegram topics</td>
+<td>Same socket setup; uses <code>agent.*</code>, <code>events.subscribe</code> and <code>tab.*</code></td>
+<td>permgps · MIT · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/furkankly/zoetrope">zoetrope (<code>zoe</code>)</a></td>
+<td>Live flow graph of a Claude Code or Codex session</td>
+<td>A herdr-plugin tool; run it from a tuios command key</td>
+<td>furkankly · MIT · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nicosuave/memex">memex</a></td>
+<td>Search and resume agent transcripts</td>
+<td>Run from a command key</td>
+<td>nicosuave · MIT · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/openclaw/crabbox">crabbox</a></td>
+<td>Warm a box, sync the diff, run the suite</td>
+<td>Run from a command key</td>
+<td>openclaw · MIT · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/madarco/agentbox">agentbox</a></td>
+<td>Parallel sandboxed agent VMs</td>
+<td>Run from a command key</td>
+<td>madarco · MIT · 2026-09-24</td>
+</tr>
+<tr>
+<td><a href="https://github.com/uwuclxdy/clauth">clauth</a></td>
+<td>Claude Code multi-account manager</td>
+<td>Run from a command key</td>
+<td>uwuclxdy · MIT · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/smarzban/tsk">tsk</a></td>
+<td>Terminal task board for people and agents</td>
+<td>Run from a command key</td>
+<td>smarzban · MIT · 2026-10-06</td>
+</tr>
+</tbody>
+</table>
+<p>Agents that herdr supports through its own hook scripts, such as Letta Code and MastraCode, report to tuios once you install herdr’s integration for them. “Run from a command key” means the tool needs no herdr calls of its own; see <a href="keybindings.html#command-keys">command keys</a>.</p>
+<h2 id="tmux-shim">tmux shim</h2>
+<p><code>tuios tmux-shim -- &lt;command&gt;</code> sets <code>TMUX</code>, answers the tmux commands a tool issues, and opens the panes it asks for as tuios panes. The shim is documented in <a href="sessions.html#the-tmux-shim">Sessions</a>.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>How it works with tuios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://code.claude.com/docs/en/hooks">Claude Code agent teams</a></td>
+<td><code>tuios tmux-shim -- env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude</code>; each teammate opens as a named tuios pane with agent state</td>
+</tr>
+<tr>
+<td><a href="https://github.com/AltanS/collie">Collie, tmux mode</a></td>
+<td>Link <code>tmux</code> to the tuios binary and pass the shim socket (<code>tmux/socket</code> beside the daemon socket) with <code>-S</code>; set <code>COLLIE_TMUX_BIN</code> and <code>COLLIE_MUX_ENDPOINT_TMUX</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/greymd/tmux-xpanes">tmux-xpanes</a></td>
+<td>Not driven through the shim: tuios ships a native clone, <code>tuios xpanes</code>, modelled on it</td>
+</tr>
+<tr>
+<td><a href="https://github.com/smtg-ai/claude-squad">claude-squad</a> †</td>
+<td>Mentioned on tuios.dev’s comparison page as a tmux-based agent manager; no documented shim compatibility</td>
+</tr>
+</tbody>
+</table>
+<h2 id="editor-plugins">Editor plugins</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it does</th>
+<th>How it relates to tuios</th>
+<th>Author · licence · updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/Tim4c/tuios-nvim-navigator">tuios-nvim-navigator</a></td>
+<td>Moves across Neovim splits and, at an edge, emits <code>OSC 7777 ; tuios-nvim-navigator ; focus ; &lt;dir&gt;</code> so tuios focuses the neighbouring pane</td>
+<td>A native tuios plugin, linked from the tuios.dev keybindings docs; needs the Neovim pane-navigation feature (off by default)</td>
+<td>Tim4c · MIT · 2026-10-01</td>
+</tr>
+<tr>
+<td><a href="https://github.com/paulbkim-dev/vim-herdr-navigation">vim-herdr-navigation</a></td>
+<td>Vim split and pane navigation</td>
+<td>Through herdr compatibility</td>
+<td>paulbkim-dev · MIT · 2026-08-23</td>
+</tr>
+<tr>
+<td><a href="https://github.com/lmilojevicc/herdr-splits.nvim">herdr-splits.nvim</a></td>
+<td>Navigation and resize</td>
+<td>Through herdr compatibility; resize does not work</td>
+<td>lmilojevicc · MIT · 2026-08-17</td>
+</tr>
+</tbody>
+</table>
+<p>Usage examples: <a href="https://github.com/stonevil/dotfiles">stonevil/dotfiles</a> (a lazy.nvim spec in <code>exact_plugins/tuios.lua</code>) and <a href="https://github.com/chenxin-yan/nix-dotfiles">chenxin-yan/nix-dotfiles</a> (<code>tuios-navigation.lua</code>), which gates on <code>TUIOS_PANE_ID</code> so the tuios plugin wins over vim-herdr-navigation, since tuios panes also export <code>HERDR_*</code>.</p>
+<p>There is no tuios plugin for Emacs, VS Code, Zed or JetBrains.</p>
+<h2 id="skills-and-agent-skills">Skills and agent skills</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it is</th>
+<th>Author · licence · updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/tuios/tree/v0.8.5/skills/tuios">Embedded skill, <code>tuios --skill [topic]</code></a></td>
+<td>First-party, compiled into the binary; topics config, errors, events, fleet, grants, herdr, hosts, inbox, mail, mcp, panes, recipes, state, tmux</td>
+<td>Gaurav Gosain · MIT · v0.8.5</td>
+</tr>
+<tr>
+<td><a href="https://github.com/agentskillexchange/skills/tree/main/skills/run-persistent-multi-agent-terminal-workspaces-with-tuios">agentskillexchange: persistent multi-agent terminal workspaces with TUIOS</a></td>
+<td>A third-party catalogue <code>SKILL.md</code> teaching agents to use sessions, state and the Inbox</td>
+<td>agentskillexchange · MIT · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/savanna0425/skillhot/blob/main/public/data/details/gaurav__gosain__tuios.json">skillhot entry</a> †</td>
+<td>A Chinese agent-skills discovery site with a tuios record</td>
+<td>savanna0425 · n/l · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/scrnetto/ai-tools-catalog">scrnetto ai-tools-catalog</a></td>
+<td>A catalogue skill (Italian) listing TUIOS among 340+ tools</td>
+<td>scrnetto · MIT · 2026-09-28</td>
+</tr>
+</tbody>
+</table>
+<p>skills.sh, SkillsMP, ClawHub, tessl and agentskill.sh have no tuios skill. Your own <code>tuios-inbox</code> skill is local and not on the public internet.</p>
+<h2 id="packaging">Packaging</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Where</th>
+<th>Version and notes</th>
+<th>Maintainer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Homebrew core</td>
+<td><a href="https://formulae.brew.sh/formula/tuios">formulae.brew.sh/formula/tuios</a>, <a href="https://github.com/Homebrew/homebrew-core/blob/main/Formula/t/tuios.rb">formula source</a></td>
+<td>0.8.5</td>
+<td>Homebrew</td>
+</tr>
+<tr>
+<td>Homebrew tap</td>
+<td><a href="https://github.com/Gaurav-Gosain/homebrew-tap">Gaurav-Gosain/homebrew-tap</a></td>
+<td><code>tuios.rb</code> and <code>tuios-web.rb</code></td>
+<td>upstream</td>
+</tr>
+<tr>
+<td>AUR</td>
+<td><a href="https://aur.archlinux.org/packages/tuios-bin">tuios-bin</a>, <a href="https://aur.archlinux.org/packages/tuios-web-bin">tuios-web-bin</a></td>
+<td>0.8.5-1, 2026-10-02</td>
+<td>Gaurav-Gosain</td>
+</tr>
+<tr>
+<td>nixpkgs</td>
+<td><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/tu/tuios/package.nix">pkgs/by-name/tu/tuios</a></td>
+<td>0.8.5 in unstable, 0.7.0 in 26.05, 0.3.4 in 25.11</td>
+<td>kpbaks</td>
+</tr>
+<tr>
+<td>Nix flake</td>
+<td><a href="https://github.com/Gaurav-Gosain/tuios/blob/v0.8.5/flake.nix">flake.nix at v0.8.5</a></td>
+<td><code>nix run github:Gaurav-Gosain/tuios/v0.8.5#tuios</code></td>
+<td>upstream</td>
+</tr>
+<tr>
+<td>NUR</td>
+<td><a href="https://github.com/lonerOrz/loneros-nur/tree/main/pkgs/tuios">lonerOrz/loneros-nur</a> †</td>
+<td>Third-party NUR package</td>
+<td>lonerOrz · MIT</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td><code>ghcr.io/gaurav-gosain/tuios</code></td>
+<td>Tags include v0.8.3, v0.8.4, v0.8.5</td>
+<td>upstream</td>
+</tr>
+<tr>
+<td>Chocolatey</td>
+<td><a href="https://community.chocolatey.org/packages/tuios">community.chocolatey.org/packages/tuios</a></td>
+<td>0.8.5</td>
+<td>mkabumattar</td>
+</tr>
+<tr>
+<td>conda-forge</td>
+<td><a href="https://github.com/conda-forge/tuios-feedstock">tuios-feedstock</a></td>
+<td>Latest built 0.7.0; 0.8.x PRs open</td>
+<td>conda-forge</td>
+</tr>
+<tr>
+<td>Alpine</td>
+<td><a href="https://pkgs.alpinelinux.org/package/edge/testing/x86_64/tuios">edge/testing/tuios</a></td>
+<td>0.6.0, outdated</td>
+<td>Alpine</td>
+</tr>
+<tr>
+<td>Gentoo</td>
+<td><a href="https://gpo.zugaina.org/app-misc/tuios-bin">app-misc/tuios-bin</a></td>
+<td>arrans-overlay</td>
+<td>arran4</td>
+</tr>
+<tr>
+<td>Void</td>
+<td><a href="https://github.com/oSoWoSo/vOid_Community_repOsitory/issues/230">community repo issue #230</a></td>
+<td>An open “update to 0.8.5” request, which implies an existing template</td>
+<td>oSoWoSo</td>
+</tr>
+<tr>
+<td>pixi / aqua</td>
+<td><a href="https://github.com/prefix-dev/octoconda">prefix-dev/octoconda</a> †</td>
+<td><code>tuios</code> in its <code>aqua.toml</code> and <code>config.toml</code></td>
+<td>prefix-dev</td>
+</tr>
+<tr>
+<td>swamp</td>
+<td><a href="https://github.com/SvenDowideit/swamp-extensions/tree/main/extensions/models/tuios"><span class="citation" data-cites="svendowideit/tuios">@svendowideit/tuios</span></a></td>
+<td>Installs and upgrades from verified releases and runs the daemon as a systemd user service</td>
+<td>Sven Dowideit</td>
+</tr>
+<tr>
+<td>Repology</td>
+<td><a href="https://repology.org/project/tuios/versions">repology.org/project/tuios</a></td>
+<td>Aggregates the channels above</td>
+<td></td>
+</tr>
+<tr>
+<td>Go</td>
+<td><a href="https://pkg.go.dev/github.com/Gaurav-Gosain/tuios">pkg.go.dev</a></td>
+<td><code>go install github.com/Gaurav-Gosain/tuios/cmd/tuios@latest</code></td>
+<td>upstream</td>
+</tr>
+</tbody>
+</table>
+<p>Not packaged: Scoop (no manifest in Main or Extras) and Winget.</p>
+<h2 id="companion-tools-and-related-projects">Companion tools and related projects</h2>
+<h3 id="first-party">First-party</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://tuios.dev">tuios.dev</a></td>
+<td>Hosted docs, blog and release notes; source at <a href="https://github.com/Gaurav-Gosain/tuios-docs">Gaurav-Gosain/tuios-docs</a> (Next.js and Fumadocs); exposes <code>/llms.txt</code>, <code>/llms-full.txt</code> and <code>.md</code> exports of every page</td>
+</tr>
+<tr>
+<td><a href="https://tuios.dev/learn">tuios.dev/learn</a></td>
+<td>The interactive tour: the real app compiled to WebAssembly, with tracks for agents, automation, from-tmux, from-zellij, make-it-yours and workspaces</td>
+</tr>
+<tr>
+<td><a href="https://tuios.dev/docs/web">tuios-web</a></td>
+<td>The browser terminal, a separate binary in <code>cmd/tuios-web</code>, served through sip</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/tuios/tree/v0.8.5/cmd/tuios-wasm">tuios-wasm</a></td>
+<td>The WebAssembly build behind the tour</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/sip">sip</a></td>
+<td>Serves Bubble Tea apps in the browser; used by tuios-web (MIT)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/tuitest">tuitest</a></td>
+<td>Headless PTY test harness that vendors tuios’s VT interpreter (MIT)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/wlterm">wlterm</a></td>
+<td>A Wayland compositor that runs inside a terminal pane; its demo nests kitty and tuios</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Gaurav-Gosain/youterm">youterm</a></td>
+<td>Kitty-graphics video player that the tuios README says works inside tuios</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Gsirawan/tuios-courier">tuios-courier</a></td>
+<td>Community relay for agent mail between machines over HTTPS (MIT), linked from tuios.dev</td>
+</tr>
+<tr>
+<td><a href="https://tuios.dev/docs/tape-scripting">Tape scripting</a>, <a href="https://tuios.dev/docs/tape-recording">tape recording</a></td>
+<td>The built-in automation DSL; see <a href="automation.html">Automation</a></td>
+</tr>
+<tr>
+<td><a href="https://deepwiki.com/Gaurav-Gosain/tuios">DeepWiki</a> †</td>
+<td>A generated wiki over the source, linked from the README</td>
+</tr>
+</tbody>
+</table>
+<h3 id="third-party-tools-built-for-or-on-tuios">Third-party tools built for or on tuios</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it does</th>
+<th>How it relates to tuios</th>
+<th>Author · licence · updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/unixsuperhero/tuios-inbox">tuios-inbox</a></td>
+<td>Local task management and an email-style inbox backed by tuios (Bun, SQLite, browser UI)</td>
+<td>Reads tuios agent turns, commands and mail</td>
+<td>unixsuperhero · none · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/eleonorayaya/utena">utena</a></td>
+<td>Workspace-management daemon and TUI: control socket, event stream, <code>utena attach</code>, popups, a dock cell</td>
+<td>Replaced tmux with tuios as its multiplexer</td>
+<td>eleonorayaya · n/l · 2026-10-04</td>
+</tr>
+<tr>
+<td><a href="https://github.com/zer0ken/xmux">xmux</a></td>
+<td>Cross-machine, cross-multiplexer session switcher</td>
+<td>Supports tuios as a mux</td>
+<td>zer0ken · MIT · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/runecraftai/squad">Squad</a></td>
+<td>Agent squad runner</td>
+<td>An experimental tuios runtime backend (<code>docs/tuios-backend.md</code>)</td>
+<td>runecraftai · MIT · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/thisismygitrepo/stackops">stackops</a></td>
+<td>Stack, dotfile and session manager</td>
+<td>A tuios session backend (<code>_tuios_backend*.py</code>, <code>sessions_tuios.py</code>, <code>tuios_export.py</code>)</td>
+<td>thisismygitrepo · Apache-2.0 · 2026-10-07</td>
+</tr>
+<tr>
+<td><a href="https://github.com/anubhavg-icpl/nestlo">nestlo</a></td>
+<td>NixOS-based OS for coding agents</td>
+<td><code>tuios_bridge.py</code> follows <code>tuios subscribe</code>, writes audit events and serves Prometheus metrics; also a NixOS tuios module</td>
+<td>anubhavg-icpl · MIT · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/qompassai/phlow/tree/main/crates/phlow-tuios">phlow-tuios</a></td>
+<td>Rust crate, “session multiplexing for phlow”</td>
+<td>A client of the line-delimited JSON control protocol</td>
+<td>qompassai · MIT or Apache-2.0 · 2026-10-04</td>
+</tr>
+<tr>
+<td><a href="https://github.com/afokapu/atdd-flow">atdd-flow</a></td>
+<td>Filesystem-first registry for tasks and handoffs (npm <code>@afokapu/atdd-flow</code>)</td>
+<td>tuios is its primary live host (<code>--application tuios</code>)</td>
+<td>afokapu · MIT · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Riyoway/WebTUIOS">WebTUIOS</a></td>
+<td>A PWA that runs tuios on Alpine in the browser through CheerpX and xterm.js</td>
+<td>Pinned to tuios v0.7.0</td>
+<td>Riyoway · MIT · 2026-08-20</td>
+</tr>
+<tr>
+<td><a href="https://github.com/henryavila/mesh-workstation">mesh-workstation</a></td>
+<td>Reproducible dev-machine setup</td>
+<td>Protected tuios browser access through a Cloudflare Access tunnel</td>
+<td>henryavila · n/l · 2026-10-02</td>
+</tr>
+<tr>
+<td><a href="https://github.com/cyberuni/cyber-mux/issues/145">cyber-mux issue #145</a></td>
+<td>A multiplexer abstraction</td>
+<td>An open proposal for a tuios adapter; not implemented</td>
+<td>cyberuni · n/l · 2026-10-06</td>
+</tr>
+<tr>
+<td><a href="https://github.com/AFDudley/mogfish/blob/main/training/scraped_completions/tuios.fish">Fish completions in mogfish</a> †</td>
+<td>Scraped fish completions; also in synmux/dotfiles-fish and ichsansting/mysh</td>
+<td><code>tuios completion fish</code> generates the real thing</td>
+<td>AFDudley · n/l · 2026-04-04</td>
+</tr>
+</tbody>
+</table>
+<h3 id="listings-articles-and-media">Listings, articles and media</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Name</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://terminaltrove.com/tuios/">Terminal Trove</a> †</td>
+<td>Tool of the Week; the badge is in the README</td>
+</tr>
+<tr>
+<td><a href="https://www.linuxlinks.com/tuios-terminal-ui-operating-system/">LinuxLinks</a></td>
+<td>Review and feature page</td>
+</tr>
+<tr>
+<td><a href="https://itsfoss.com/terminal-multiplexers/">It’s FOSS: 8 terminal multiplexers worth trying</a></td>
+<td>Includes TUIOS</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ruanyf/weekly/issues/8148">ruanyf weekly, issue 8148</a></td>
+<td>Chinese weekly newsletter recommendation, 2025-11-11</td>
+</tr>
+<tr>
+<td><a href="https://devops-blog.virtualtech.jp/entry/20251208/1765153476">とことんDevOps blog</a></td>
+<td>Japanese article on TUIOS as a tiling window manager in the terminal, 2025-12-08</td>
+</tr>
+<tr>
+<td><a href="https://minerva.mamansoft.net/Notes/TUIOS">Minerva note</a></td>
+<td>Japanese personal knowledge-base note</td>
+</tr>
+<tr>
+<td><a href="https://mortaf3.com/posts/tuios-pp7bm">mortaf3: TUIOS, terminal window manager for agents</a> †</td>
+<td>Blog post</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kawarimidoll/slides/blob/main/terminalnight-2025-11-28/talk.sh">kawarimidoll terminalnight talk</a></td>
+<td>A live terminal talk script that launches tuios as a demo, 2025-11-28</td>
+</tr>
+<tr>
+<td>Awesome lists</td>
+<td><a href="https://github.com/rothgar/awesome-tuis">awesome-tuis</a>, <a href="https://github.com/arran4/awesome-terminal-multiplexers">awesome-terminal-multiplexers</a>, <a href="https://github.com/phamquiluan/awesome-cli-agents">awesome-cli-agents</a>, <a href="https://github.com/QAInsights/awesome-ai-tools">awesome-ai-tools</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/handyutils/justtuit">justtuit</a></td>
+<td>A TUI catalogue of 672 terminal apps with a TUIOS entry</td>
+</tr>
+<tr>
+<td><a href="https://github.com/scmmishra/terminal-apps.dev/issues/46">terminal-apps.dev submission</a></td>
+<td>An open submission; not on the site yet</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ryan4yin/nix-config">ryan4yin/nix-config</a></td>
+<td>A widely-copied NixOS config that replaced zellij with tuios and later removed standalone herdr as superseded by tuios</td>
+</tr>
+<tr>
+<td>Release feeds</td>
+<td><a href="https://tuios.dev/releases/atom.xml">releases atom</a>, <a href="https://tuios.dev/blog/atom.xml">blog atom</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="searched-but-found-nothing">Searched but found nothing</h2>
+<p>So that you do not repeat the search, these came up empty on 7 October 2026:</p>
+<ul>
+<li><strong>MCP registries.</strong> Glama, PulseMCP, Smithery and mcp.so have no tuios entry.</li>
+<li><strong>Skill marketplaces.</strong> skills.sh, SkillsMP, ClawHub, tessl and agentskill.sh have no tuios skill.</li>
+<li><strong>Editor plugins.</strong> Nothing for Emacs, VS Code, Zed or JetBrains.</li>
+<li><strong>Theme packs.</strong> No dedicated theme repository; the GitHub topic <code>tuios</code> has no repositories.</li>
+<li><strong>Windows packaging.</strong> No Scoop or Winget manifest.</li>
+<li><strong>Plugin registries.</strong> No third-party tuios plugin on npm or in opencode’s registry apart from atdd-flow, which names tuios as a host.</li>
+<li><strong>Video and audio.</strong> No YouTube video or podcast surfaced; the demo MP4s live on tuios.dev’s release pages.</li>
+<li><strong>Discussion threads.</strong> No indexed Hacker News or Reddit thread.</li>
+<li><strong>herdr’s side.</strong> herdr’s plugin page does not mention tuios; compatibility is documented only by tuios.</li>
+<li><strong>Code search</strong> for <code>tuios set-agent-state</code>, <code>tuios integration install</code>, <code>tuios import-theme</code> and <code>tuios --skill</code> outside the upstream repository found no third-party hits.</li>
+<li><strong>Excluded as noise.</strong> TUIO touch-protocol projects; <code>benmulligan4/tuiOS</code>, <code>meavxxxx/TuiOS</code> and <code>Erickrus/runtui</code> (unrelated projects with the same name); plain forks and mirrors; GitHub-trending archive dumps.</li>
+</ul>
+<h2 id="submitting-something">Submitting something</h2>
+<p>If you build a dock component, a theme or an integration worth listing, the places the tuios project itself links from are the README, <code>docs/AGENT_STATE.md</code> for anything agent-related, and <code>examples/dock/</code> for components. Open a pull request against <a href="https://github.com/Gaurav-Gosain/tuios">Gaurav-Gosain/tuios</a> following <code>docs/CONTRIBUTING.md</code>, or a documentation change against <a href="https://github.com/Gaurav-Gosain/tuios-docs">tuios-docs</a>. Add it to this chapter too.</p>
+      </article>
+
+      <nav class="chapter-foot" id="chapter-foot" aria-label="Previous and next chapter">
+        <a class="prev empty" id="prev-link" href="#"><small>Previous</small><span></span></a>
+        <a class="next empty" id="next-link" href="#"><small>Next</small><span></span></a>
+      </nav>
+      <div class="colophon">
+        <span>tuios manual · generated by pandoc · usable offline from <code>file://</code></span>
+        <span><a href="https://tuios.dev">tuios.dev</a> · <a href="https://github.com/Gaurav-Gosain/tuios">source</a></span>
+      </div>
+    </main>
+
+    <aside class="page-side">
+      <div class="side-label">On this page</div>
+      <div class="progress"><div id="progress-bar"></div></div>
+      <nav id="page-toc"><ul>
+<li><a href="#quick-map" id="toc-quick-map">Quick map</a></li>
+<li><a href="#dock-components" id="toc-dock-components">Dock components</a></li>
+<li><a href="#themes" id="toc-themes">Themes</a></li>
+<li><a href="#coding-agent-harness-integrations" id="toc-coding-agent-harness-integrations">Coding-agent harness integrations</a>
+<ul>
+<li><a href="#upstream-hook-and-plugin-mechanisms-tuios-targets" id="toc-upstream-hook-and-plugin-mechanisms-tuios-targets">Upstream hook and plugin mechanisms tuios targets</a></li>
+<li><a href="#third-party-hooks-and-integrations" id="toc-third-party-hooks-and-integrations">Third-party hooks and integrations</a></li>
+</ul></li>
+<li><a href="#mcp" id="toc-mcp">MCP</a></li>
+<li><a href="#herdr-compatibility-and-the-herdr-ecosystem" id="toc-herdr-compatibility-and-the-herdr-ecosystem">herdr compatibility and the herdr ecosystem</a></li>
+<li><a href="#tmux-shim" id="toc-tmux-shim">tmux shim</a></li>
+<li><a href="#editor-plugins" id="toc-editor-plugins">Editor plugins</a></li>
+<li><a href="#skills-and-agent-skills" id="toc-skills-and-agent-skills">Skills and agent skills</a></li>
+<li><a href="#packaging" id="toc-packaging">Packaging</a></li>
+<li><a href="#companion-tools-and-related-projects" id="toc-companion-tools-and-related-projects">Companion tools and related projects</a>
+<ul>
+<li><a href="#first-party" id="toc-first-party">First-party</a></li>
+<li><a href="#third-party-tools-built-for-or-on-tuios" id="toc-third-party-tools-built-for-or-on-tuios">Third-party tools built for or on tuios</a></li>
+<li><a href="#listings-articles-and-media" id="toc-listings-articles-and-media">Listings, articles and media</a></li>
+</ul></li>
+<li><a href="#searched-but-found-nothing" id="toc-searched-but-found-nothing">Searched but found nothing</a></li>
+<li><a href="#submitting-something" id="toc-submitting-something">Submitting something</a></li>
+</ul></nav>
+    </aside>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+
+  /* ── theme: auto / light / dark, remembered ── */
+  var THEME_KEY = 'tuios-manual-theme';
+  var media = window.matchMedia('(prefers-color-scheme: dark)');
+  var btn = document.getElementById('theme-btn');
+  function applyTheme(mode) {
+    root.setAttribute('data-theme', mode);
+    root.classList.toggle('dark-auto', mode === 'auto' && media.matches);
+    btn.textContent = mode;
+  }
+  var saved = 'auto';
+  try { saved = localStorage.getItem(THEME_KEY) || 'auto'; } catch (e) {}
+  applyTheme(saved);
+  media.addEventListener && media.addEventListener('change', function () { applyTheme(root.getAttribute('data-theme')); });
+  function cycleTheme() {
+    var order = ['auto', 'light', 'dark'];
+    var next = order[(order.indexOf(root.getAttribute('data-theme')) + 1) % order.length];
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  }
+  btn.addEventListener('click', cycleTheme);
+
+  /* ── which chapter is this ── */
+  var here = (location.pathname.split('/').pop() || '').replace(/[?#].*$/, '');
+  var chapters = Array.prototype.slice.call(document.querySelectorAll('.book-chapters li'));
+  var idx = -1;
+  chapters.forEach(function (li, i) {
+    var a = li.querySelector('a');
+    if (a && a.getAttribute('href') === here) { li.classList.add('current'); idx = i; }
+  });
+  function fillFoot(id, li, cls) {
+    var el = document.getElementById(id);
+    if (!li) { el.classList.add('empty'); return; }
+    var a = li.querySelector('a');
+    el.href = a.getAttribute('href');
+    el.querySelector('span').textContent = a.querySelector('.label').textContent;
+    el.classList.remove('empty');
+  }
+  fillFoot('prev-link', idx > 0 ? chapters[idx - 1] : null);
+  fillFoot('next-link', idx >= 0 && idx < chapters.length - 1 ? chapters[idx + 1] : null);
+
+  /* ── heading anchors ── */
+  document.querySelectorAll('article h2[id], article h3[id], article h4[id]').forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'anchor'; a.href = '#' + h.id; a.textContent = '#'; a.setAttribute('aria-label', 'Link to this section');
+    h.appendChild(a);
+  });
+
+  /* ── wide tables scroll instead of overflowing ── */
+  document.querySelectorAll('article table').forEach(function (t) {
+    var w = document.createElement('div'); w.className = 'table-wrap';
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+
+  /* ── copy buttons + language labels on code blocks ── */
+  document.querySelectorAll('article pre').forEach(function (pre) {
+    var host = pre.parentNode.classList && pre.parentNode.classList.contains('sourceCode') ? pre.parentNode : pre;
+    var code = pre.querySelector('code');
+    var lang = '';
+    (code ? code.className : pre.className).split(/\s+/).forEach(function (c) {
+      if (c && c !== 'sourceCode' && c !== 'numberSource') lang = c;
+    });
+    var tools = document.createElement('div'); tools.className = 'code-tools';
+    if (lang) { var l = document.createElement('span'); l.className = 'code-lang'; l.textContent = lang; tools.appendChild(l); }
+    var b = document.createElement('button'); b.className = 'copy-btn'; b.type = 'button'; b.textContent = 'copy';
+    b.addEventListener('click', function () {
+      var text = (code || pre).innerText.replace(/\n$/, '');
+      function done() { b.textContent = 'copied'; b.classList.add('done'); setTimeout(function () { b.textContent = 'copy'; b.classList.remove('done'); }, 1400); }
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, done); }
+      else { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(); }
+    });
+    tools.appendChild(b);
+    host.appendChild(tools);
+  });
+
+  /* ── outline scroll-spy + reading progress ── */
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll('#page-toc a[href^="#"]'));
+  var targets = tocLinks.map(function (a) { return document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1))); });
+  var bar = document.getElementById('progress-bar');
+  var ticking = false;
+  function spy() {
+    ticking = false;
+    var y = window.scrollY + 90, current = -1;
+    for (var i = 0; i < targets.length; i++) { if (targets[i] && targets[i].offsetTop <= y) current = i; }
+    tocLinks.forEach(function (a, i) { a.classList.toggle('active', i === current); });
+    if (current >= 0) {
+      var act = tocLinks[current], side = document.querySelector('.page-side');
+      if (side) { var r = act.getBoundingClientRect(), s = side.getBoundingClientRect(); if (r.top < s.top + 40 || r.bottom > s.bottom - 40) act.scrollIntoView({ block: 'center' }); }
+    }
+    if (bar) { var h = document.documentElement; var p = h.scrollHeight - h.clientHeight; bar.style.width = (p > 0 ? Math.min(100, 100 * window.scrollY / p) : 0) + '%'; }
+  }
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(spy); } });
+  spy();
+
+  /* ── search: sections of this chapter + chapter names ── */
+  var input = document.getElementById('search');
+  var results = document.getElementById('search-results');
+  var headings = Array.prototype.slice.call(document.querySelectorAll('article h2[id], article h3[id], article h4[id]')).map(function (h) {
+    var trail = [], el = h;
+    var level = parseInt(h.tagName.slice(1), 10);
+    while (el && level > 2) { el = el.previousElementSibling; if (el && /^H[1-6]$/.test(el.tagName) && parseInt(el.tagName.slice(1), 10) < level) { trail.unshift(el.firstChild ? el.firstChild.textContent : ''); level = parseInt(el.tagName.slice(1), 10); } }
+    return { text: h.firstChild ? h.firstChild.textContent : h.textContent, id: h.id, trail: trail.join(' › '), kind: h.tagName.toLowerCase() };
+  });
+  var chapterItems = chapters.map(function (li) { var a = li.querySelector('a'); return { text: a.querySelector('.label').textContent, href: a.getAttribute('href'), kind: 'chapter' }; });
+  var active = -1;
+  function render(q) {
+    q = q.trim().toLowerCase();
+    results.innerHTML = ''; active = -1;
+    if (!q) { results.classList.remove('open'); return; }
+    var words = q.split(/\s+/);
+    function score(t) { t = t.toLowerCase(); var s = 0; for (var i = 0; i < words.length; i++) { var p = t.indexOf(words[i]); if (p < 0) return -1; s += (p === 0 ? 3 : 1); } return s; }
+    var hits = [];
+    headings.forEach(function (h) { var s = score(h.text + ' ' + h.trail); if (s >= 0) hits.push({ s: s + (h.kind === 'h2' ? 1 : 0), label: h.text, sub: h.trail || 'this chapter', href: '#' + h.id }); });
+    chapterItems.forEach(function (c) { var s = score(c.text); if (s >= 0) hits.push({ s: s, label: c.text, sub: 'chapter', href: c.href }); });
+    hits.sort(function (a, b) { return b.s - a.s; });
+    if (!hits.length) { results.innerHTML = '<div class="none">No matching section in this chapter.</div>'; results.classList.add('open'); return; }
+    hits.slice(0, 30).forEach(function (h) {
+      var a = document.createElement('a'); a.href = h.href;
+      a.innerHTML = '<span></span><small></small>';
+      a.firstChild.textContent = h.label; a.lastChild.textContent = h.sub;
+      a.addEventListener('click', function () { results.classList.remove('open'); });
+      results.appendChild(a);
+    });
+    results.classList.add('open');
+  }
+  function move(d) {
+    var items = results.querySelectorAll('a'); if (!items.length) return;
+    active = (active + d + items.length) % items.length;
+    items.forEach(function (a, i) { a.classList.toggle('active', i === active); });
+    items[active].scrollIntoView({ block: 'nearest' });
+  }
+  input.addEventListener('input', function () { render(input.value); });
+  input.addEventListener('focus', function () { if (input.value) render(input.value); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+    else if (e.key === 'Enter') { var a = results.querySelectorAll('a')[active < 0 ? 0 : active]; if (a) { a.click(); location.href = a.getAttribute('href'); } }
+    else if (e.key === 'Escape') { input.value = ''; results.classList.remove('open'); input.blur(); }
+  });
+  document.addEventListener('click', function (e) { if (!e.target.closest('.search-wrap')) results.classList.remove('open'); });
+
+  /* ── keys: / [ ] t ── */
+  document.addEventListener('keydown', function (e) {
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === '/') { e.preventDefault(); input.focus(); input.select(); }
+    else if (e.key === 't') { cycleTheme(); }
+    else if (e.key === '[') { var p = document.getElementById('prev-link'); if (!p.classList.contains('empty')) location.href = p.getAttribute('href'); }
+    else if (e.key === ']') { var n = document.getElementById('next-link'); if (!n.classList.contains('empty')) location.href = n.getAttribute('href'); }
+  });
+})();
+</script>
+</body>
+</html>

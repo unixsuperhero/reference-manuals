@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""Check relative Markdown links and anchors across docs/, plus fenced-div balance.
+
+Usage: bin/check-links [docs/path.md ...]   (default: every docs/**/*.md)
+Exit 1 when a relative link points at a missing file or a missing heading anchor,
+when a pandoc fenced div (::: name) is left unclosed, or when the body has an H1.
+"""
+from __future__ import annotations
+
+import re
+import sys
+import unicodedata
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+LINK = re.compile(r"(?<!\!)\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
+FENCE = re.compile(r"^(```|~~~)")
+
+
+def pandoc_id(text: str, seen: dict[str, int]) -> str:
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
+    # pandoc's smart extension turns `--`, `---` and `...` outside code spans
+    # into dashes and an ellipsis, which the id generator then drops.
+    parts = re.split(r"(`[^`]*`)", text)
+    text = "".join(
+        part[1:-1] if part.startswith("`") and part.endswith("`") and len(part) >= 2
+        else re.sub(r"-{2,3}|\.\.\.", "", part)
+        for part in parts
+    )
+    text = re.sub(r"[*]", "", text)
+    explicit = re.search(r"\{#([^}\s]+)[^}]*\}\s*$", text)
+    if explicit:
+        return explicit.group(1)
+    text = unicodedata.normalize("NFKD", text)
+    base = "".join(c for c in text.casefold() if c.isalnum() or c in " -_.")
+    base = re.sub(r"\s+", "-", base.strip())
+    base = re.sub(r"^[^a-z]+", "", base) or "section"
+    n = seen.get(base, 0)
+    seen[base] = n + 1
+    return base if n == 0 else f"{base}-{n}"
+
+
+def scan(path: Path):
+    ids: set[str] = set()
+    seen: dict[str, int] = {}
+    links: list[tuple[int, str]] = []
+    problems: list[str] = []
+    in_fence = False
+    divs: list[tuple[int, str]] = []
+    lines = path.read_text(encoding="utf-8").splitlines()
+    body_start = 0
+    if lines and lines[0].strip() == "---":
+        for i in range(1, len(lines)):
+            if lines[i].strip() in {"---", "..."}:
+                body_start = i + 1
+                break
+    for n, line in enumerate(lines[body_start:], body_start + 1):
+        if FENCE.match(line.strip()):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if line.startswith(":::"):
+            rest = line[3:].strip()
+            if rest:
+                divs.append((n, rest))
+            elif divs:
+                divs.pop()
+            else:
+                problems.append(f"{path}:{n}: closing ::: without an open div")
+            continue
+        h = HEADING.match(line)
+        if h:
+            if len(h.group(1)) == 1:
+                problems.append(f"{path}:{n}: H1 in body (the template renders the title)")
+            ids.add(pandoc_id(h.group(2), seen))
+        for m in LINK.finditer(line):
+            links.append((n, m.group(1)))
+    for n, name in divs:
+        problems.append(f"{path}:{n}: fenced div '{name}' never closed")
+    return ids, links, problems
+
+
+def main(argv: list[str]) -> int:
+    targets = [Path(a).resolve() for a in argv[1:]] or sorted((REPO / "docs").rglob("*.md"))
+    all_docs = sorted((REPO / "docs").rglob("*.md"))
+    index = {p: scan(p) for p in all_docs}
+    problems: list[str] = []
+    for path in targets:
+        ids, links, local = index.get(path) or scan(path)
+        problems.extend(local)
+        for n, target in links:
+            if re.match(r"^[a-z]+:", target):
+                continue
+            file_part, _, anchor = target.partition("#")
+            dest = path if not file_part else (path.parent / file_part).resolve()
+            if file_part and not dest.exists():
+                problems.append(f"{path}:{n}: missing file {target}")
+                continue
+            if anchor and dest.suffix == ".md":
+                dest_ids = index[dest][0] if dest in index else scan(dest)[0]
+                if anchor not in dest_ids:
+                    problems.append(f"{path}:{n}: missing anchor #{anchor} in {dest.relative_to(REPO)}")
+    for p in problems:
+        print(p)
+    print(f"check-links: {len(targets)} file(s), {len(problems)} problem(s)")
+    return 1 if problems else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))
