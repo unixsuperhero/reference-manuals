@@ -2,6 +2,7 @@
 
 1. [zshoptions.md](./docs/zshoptions.md) ([html](./export/zshoptions.html))
 2. [mdls and Spotlight Metadata Attributes](./docs/mdls.md) ([html](./export/mdls.html))
+3. [git bundle](./docs/git-bundle.md) ([html](./export/git-bundle.html))
 
 ## TUIOS manual (v0.8.5)
 
